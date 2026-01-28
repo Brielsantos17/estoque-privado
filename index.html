@@ -336,10 +336,22 @@
 
     window.onload = function() {
         document.getElementById('date-display').innerText = new Date().toLocaleDateString('pt-BR');
-        // Listeners
-        db.collection("inventory").onSnapshot((qs) => { inventory=[]; qs.forEach(d => inventory.push({...d.data(), id:d.id})); renderPDV(); renderStock(); });
-        db.collection("customers").onSnapshot((qs) => { customers=[]; qs.forEach(d => customers.push({...d.data(), id:d.id})); renderCustomers(); });
-        db.collection("sales").orderBy("timestamp", "desc").limit(50).onSnapshot((qs) => { salesHistory=[]; qs.forEach(d => salesHistory.push({...d.data(), id:d.id})); renderFinancials(); });
+        // Listeners com proteção contra dados vazios
+        db.collection("inventory").onSnapshot((qs) => { 
+            inventory=[]; 
+            qs.forEach(d => inventory.push({...d.data(), id:d.id})); 
+            renderPDV(); renderStock(); 
+        });
+        db.collection("customers").onSnapshot((qs) => { 
+            customers=[]; 
+            qs.forEach(d => customers.push({...d.data(), id:d.id})); 
+            renderCustomers(); 
+        });
+        db.collection("sales").orderBy("timestamp", "desc").limit(50).onSnapshot((qs) => { 
+            salesHistory=[]; 
+            qs.forEach(d => salesHistory.push({...d.data(), id:d.id})); 
+            renderFinancials(); 
+        });
     }
 
     // --- NAVEGAÇÃO ---
@@ -426,9 +438,17 @@
 
     let pdvFilter = 'todos';
     function filterPDV(t, b) { pdvFilter = t; document.querySelectorAll('.btn-filter').forEach(x => x.classList.remove('active')); if(b) b.classList.add('active'); renderPDV(); }
+    
+    // --- FUNÇÕES DE RENDERIZAÇÃO BLINDADAS (Aqui estava o erro) ---
     function renderPDV() {
-        const grid = document.getElementById('pdv-grid'); const term = document.getElementById('pdv-search').value.toLowerCase(); grid.innerHTML = '';
-        inventory.filter(i => (pdvFilter==='todos'||i.type===pdvFilter) && i.name.toLowerCase().includes(term)).forEach(i => {
+        const grid = document.getElementById('pdv-grid'); 
+        const term = document.getElementById('pdv-search').value.toLowerCase(); 
+        grid.innerHTML = '';
+        inventory.filter(i => {
+            // PROTEÇÃO: Se o nome for vazio/nulo, usa ''
+            const name = i.name ? i.name.toLowerCase() : '';
+            return (pdvFilter==='todos'||i.type===pdvFilter) && name.includes(term);
+        }).forEach(i => {
             const op = i.qty===0?'0.5':'1';
             grid.innerHTML += `<div class="product-card" style="opacity:${op}" onclick="addToCart('${i.id}')"><div class="size-badge">${i.size}</div><img src="${i.img||NO_IMG}"><div style="padding:10px;font-size:0.9rem;"><b>${i.name}</b><br><small>${i.type}</small><br><span style="color:var(--primary);font-weight:bold;">R$ ${i.price.toFixed(2)}</span></div></div>`;
         });
@@ -451,11 +471,23 @@
     function openCheckout() { if(cart.length===0) return; toggleCartDrawer(); document.getElementById('chk-total').innerText = document.getElementById('cart-total').innerText; selectedClient=null; document.getElementById('chk-selected-cli').style.display='none'; openModal('modal-checkout'); }
     function searchCheckoutClient() {
         const t = document.getElementById('chk-search-cli').value.toLowerCase(); const r = document.getElementById('chk-results'); r.innerHTML=''; r.style.display='block';
-        customers.filter(c=>c.name.toLowerCase().includes(t)).forEach(c=>{ r.innerHTML+=`<div style="padding:10px;cursor:pointer;" onclick="selectClient('${c.id}')">${c.name}</div>`; });
+        customers.filter(c => {
+            const name = c.name ? c.name.toLowerCase() : '';
+            return name.includes(t);
+        }).forEach(c=>{ r.innerHTML+=`<div style="padding:10px;cursor:pointer;" onclick="selectClient('${c.id}')">${c.name}</div>`; });
     }
     function selectClient(id) { selectedClient = customers.find(c=>c.id===id); document.getElementById('chk-selected-cli').innerText='Cliente: '+selectedClient.name; document.getElementById('chk-selected-cli').style.display='block'; document.getElementById('chk-results').style.display='none'; }
 
-    function renderStock() { const tb = document.getElementById('table-stock'); const t = document.getElementById('stock-search').value.toLowerCase(); tb.innerHTML=''; inventory.filter(i=>i.name.toLowerCase().includes(t)).forEach(i=>{ tb.innerHTML+=`<tr><td>${i.name}</td><td>${i.size}</td><td>R$ ${i.price}</td><td>${i.qty}</td><td><button onclick="openEdit('${i.id}')">✏️</button> <button onclick="deleteItem('${i.id}')">🗑️</button></td></tr>`; }); }
+    function renderStock() { 
+        const tb = document.getElementById('table-stock'); 
+        const t = document.getElementById('stock-search').value.toLowerCase(); 
+        tb.innerHTML=''; 
+        inventory.filter(i => {
+            const name = i.name ? i.name.toLowerCase() : '';
+            return name.includes(t);
+        }).forEach(i=>{ tb.innerHTML+=`<tr><td>${i.name}</td><td>${i.size}</td><td>R$ ${i.price}</td><td>${i.qty}</td><td><button onclick="openEdit('${i.id}')">✏️</button> <button onclick="deleteItem('${i.id}')">🗑️</button></td></tr>`; }); 
+    }
+    
     function openEdit(id) {
         const i = inventory.find(x=>x.id===id); if(!i)return;
         document.getElementById('edit-id').value=i.id; document.getElementById('edit-name').value=i.name; document.getElementById('edit-price').value=i.price; document.getElementById('edit-qty').value=i.qty;
@@ -463,7 +495,16 @@
         editImg=i.img; document.getElementById('edit-preview').src=i.img||NO_IMG; openModal('modal-edit');
     }
 
-    function renderCustomers() { const tb = document.getElementById('table-cli'); const t = document.getElementById('search-cli').value.toLowerCase(); tb.innerHTML=''; customers.filter(c=>c.name.toLowerCase().includes(t)).forEach(c=>{ tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.phone}</td><td>R$ ${(c.cashback||0).toFixed(2)}</td></tr>`; }); }
+    function renderCustomers() { 
+        const tb = document.getElementById('table-cli'); 
+        const t = document.getElementById('search-cli').value.toLowerCase(); 
+        tb.innerHTML=''; 
+        customers.filter(c => {
+            const name = c.name ? c.name.toLowerCase() : '';
+            return name.includes(t);
+        }).forEach(c=>{ tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.phone}</td><td>R$ ${(c.cashback||0).toFixed(2)}</td></tr>`; }); 
+    }
+    
     function renderFinancials() {
         const tot = salesHistory.reduce((a,b)=>a+b.total,0); document.getElementById('fin-total').innerText=tot.toFixed(2); document.getElementById('fin-count').innerText=salesHistory.length;
         const avg = salesHistory.length?(tot/salesHistory.length):0; document.getElementById('fin-ticket').innerText=avg.toFixed(2);
