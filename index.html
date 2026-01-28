@@ -3,318 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Litoral Brasil Concha - ERP Cloud</title>
+    <title>Litoral Brasil</title>
     <style>
         :root {
-            --primary: #005691; --primary-dark: #004472; --gold: #fbc02d;
-            --bg: #f4f6f9; --white: #ffffff; --text: #333333;
-            --sidebar-width: 260px; --success: #27ae60; --danger: #e74c3c;
-            --info: #3498db; --pink: #e84393; --purple: #8e44ad; --warning: #f39c12;
+            --primary: #005691; --bg: #f4f6f9; --white: #ffffff;
+            --gold: #fbc02d; --danger: #e74c3c; --success: #27ae60;
         }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', 'Roboto', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: var(--bg); color: #333; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* SIDEBAR / NAV */
-        .sidebar { width: var(--sidebar-width); background: var(--primary); color: white; display: flex; flex-direction: column; height: 100vh; z-index: 10; transition: 0.3s; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
-        .brand { padding: 20px; text-align: center; background: var(--primary-dark); border-bottom: 3px solid var(--gold); }
-        .brand img { height: 50px; display: block; margin: 0 auto 10px; }
-        .nav-links { flex: 1; padding-top: 20px; display: flex; flex-direction: column; gap: 5px; }
-        .nav-btn { background: transparent; border: none; color: rgba(255,255,255,0.8); padding: 15px 25px; text-align: left; font-size: 1rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; }
-        .nav-btn.active { background: var(--white); color: var(--primary); font-weight: bold; border-right: 5px solid var(--gold); }
-        .user-panel { padding: 20px; background: rgba(0,0,0,0.1); text-align: center; font-size: 0.9rem; }
+        /* --- MENU INFERIOR (SEMPRE FIXO) --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
+            background: var(--primary); display: flex; justify-content: space-around; align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-btn {
+            background: none; border: none; color: rgba(255,255,255,0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 0.75rem; gap: 4px; width: 100%; height: 100%; cursor: pointer;
+        }
+        .nav-btn span { font-size: 1.4rem; }
+        .nav-btn.active { color: var(--gold); font-weight: bold; }
+        .nav-btn.active span { transform: scale(1.1); transition: 0.2s; }
 
-        /* LAYOUT */
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
-        .top-bar { background: var(--white); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0; }
-        .view-container { flex: 1; padding: 30px; overflow-y: auto; padding-bottom: 100px; }
+        /* --- CONTEÚDO --- */
+        .main-content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; /* Espaço pro menu */ }
         .view-section { display: none; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
 
-        /* COMPONENTES */
-        .products-panel { display: flex; flex-direction: column; gap: 15px; }
-        .filters-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .btn-filter { background: white; border: 1px solid #ddd; color: #555; border-radius: 20px; padding: 8px 18px; white-space: nowrap; cursor: pointer; }
-        .btn-filter.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .btn-filter-fit.active { background: var(--purple); border-color: var(--purple); }
+        /* --- UI ELEMENTS --- */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .product-card { background: white; border-radius: 8px; padding: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; position: relative; }
-        .product-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; background: #eee; }
-        .size-badge { position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; }
-
-        /* TABELAS E FORMULARIOS */
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; min-width: 600px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f1f2f6; color: var(--primary); font-weight: 600; font-size: 0.85rem; }
-        .table-responsive { overflow-x: auto; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .product-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
+        .product-card img { width: 100%; height: 150px; object-fit: cover; background: #eee; }
+        .info-box { padding: 10px; }
         
-        .form-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-width: 800px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; }
+        .filters-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; }
+        .btn-pill { background: white; border: 1px solid #ddd; padding: 6px 16px; border-radius: 20px; white-space: nowrap; font-size: 0.9rem; color: #555; }
+        .btn-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
         
-        /* BOTÕES */
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; }
-        .btn-primary { background: var(--primary); } .btn-success { background: var(--success); }
-        .btn-pink { background: var(--pink); } .btn-danger { background: var(--danger); }
-        .btn-info { background: var(--info); } .btn-dark { background: #34495e; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; font-size: 16px; background: white; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; color: white; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .btn-success { background: var(--success); } .btn-danger { background: var(--danger); }
+        .btn-primary { background: var(--primary); } .btn-pink { background: #e84393; }
 
-        /* KPI */
-        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { background: white; padding: 20px; border-radius: 8px; border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .kpi-info .value { font-size: 1.8rem; font-weight: bold; }
+        /* --- FLUTUANTES --- */
+        .cart-float { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 3px solid white; z-index: 900; cursor: pointer; }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border: 2px solid white; font-weight: bold; }
 
-        /* FLUTUANTES */
-        .shell-cart-btn { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: var(--gold); border-radius: 50%; box-shadow: 0 5px 20px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; border: 4px solid white; }
-        .shell-icon { width: 40px; height: 40px; fill: var(--primary); }
-        .cart-badge { position: absolute; top: 0; right: 0; background: var(--danger); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; border: 2px solid white; }
-
-        /* DRAWER & MODAL */
-        .cart-drawer-overlay, .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; display: none; }
-        .cart-drawer { position: fixed; top: 0; right: -400px; width: 350px; height: 100%; background: white; z-index: 999; transition: 0.3s; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.1); }
-        .cart-drawer.open { right: 0; }
-        .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
-        .drawer-footer { padding: 20px; background: #f9f9f9; border-top: 1px solid #eee; }
+        /* --- MODAIS & DRAWER --- */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1100; display: none; }
+        .drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 20px 20px 0 0; z-index: 1200; transition: 0.3s; padding: 20px; max-height: 85vh; overflow-y: auto; }
+        .drawer.open { bottom: 0; }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background: white; padding: 25px; border-radius: 12px; z-index: 1300; display: none; max-height: 90vh; overflow-y: auto; }
         
-        .modal-box { background: white; width: 600px; max-width: 90%; padding: 25px; border-radius: 8px; z-index: 1000; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); max-height: 90vh; overflow-y: auto; display: none; }
-        .modal-overlay.open .modal-box { display: block; }
-        .modal-overlay.open { display: block; }
+        .builder-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .build-item { min-width: 100px; text-align: center; border: 1px solid #eee; padding: 5px; border-radius: 8px; }
+        .build-item.selected { border: 2px solid var(--primary); background: #e3f2fd; }
+        .build-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; }
 
-        /* BUILDER */
-        .builder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .b-list { height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
-        .b-item { padding: 8px; border-bottom: 1px solid #f9f9f9; cursor: pointer; display: flex; align-items: center; }
-        .b-item.selected { background: #e1f5fe; border-left: 4px solid var(--primary); }
-
-        .backup-section { background: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 8px; margin-top: 30px; }
-        .backup-section h3 { color: #856404; margin-top: 0; }
-
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { position: fixed; bottom: 0; width: 100%; height: 60px; flex-direction: row; padding: 0; justify-content: space-around; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-            .brand, .user-panel { display: none; }
-            .nav-links { flex-direction: row; padding: 0; width: 100%; justify-content: space-around; }
-            .nav-btn { flex-direction: column; padding: 5px; font-size: 0.7rem; justify-content: center; gap: 2px; border: none; }
-            .nav-btn.active { border-top: 3px solid var(--gold); border-right: none; color: var(--primary); }
-            .top-bar { padding: 0 15px; }
-            .view-container { padding: 15px; padding-bottom: 80px; }
-            .product-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            .kpi-grid { grid-template-columns: 1fr; gap: 10px; }
-            .cart-drawer { width: 100%; right: -100%; }
-            .shell-cart-btn { bottom: 70px; right: 20px; width: 60px; height: 60px; }
-            .modal-box { width: 95%; max-height: 90vh; }
-            .builder-grid { grid-template-columns: 1fr; }
-            .b-list { height: 150px; }
-        }
+        /* Table Responsive */
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        .kpi-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .kpi { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary); }
     </style>
 </head>
 <body>
 
-<aside class="sidebar">
-    <div class="brand"><img src="logo.png" alt="LBC" onerror="this.style.display='none'"><h1>LITORAL</h1></div>
-    <div class="nav-links">
-        <button class="nav-btn active" onclick="switchTab('pdv')" id="btn-pdv"><span>🛒</span> PDV</button>
-        <button class="nav-btn" onclick="switchTab('clientes')" id="btn-clientes"><span>👥</span> Clientes</button>
-        <button class="nav-btn" onclick="switchTab('estoque')" id="btn-estoque"><span>📦</span> Estoque</button>
-        <button class="nav-btn" onclick="switchTab('financeiro')" id="btn-financeiro"><span>💰</span> Financeiro</button>
-        <button class="nav-btn" onclick="switchTab('cadastro')" id="btn-cadastro"><span>➕</span> Estoque Cadastro</button>
-    </div>
-    <div class="user-panel">Admin</div>
-</aside>
-
-<div class="main-content">
+<div id="pdv" class="view-section active">
     <div class="top-bar">
-        <h3>Litoral Brasil</h3>
-        <button class="btn btn-success btn-sm" style="border-radius:20px;">☁️ Online</button>
+        <h2 style="margin:0; color:var(--primary);">Litoral Brasil</h2>
+        <small style="color:#777;">Online ☁️</small>
+    </div>
+    
+    <div class="filters-scroll">
+        <button class="btn-pill active" onclick="filter('todos', this)">Todos</button>
+        <button class="btn-pill" onclick="filter('Sutiã', this)">Sutiã</button>
+        <button class="btn-pill" onclick="filter('Calcinha', this)">Calcinha</button>
+        <button class="btn-pill" onclick="filter('Conjunto', this)">Conjunto</button>
+        <button class="btn-pill" onclick="filter('Fit-Top', this)">Top Fit</button>
+        <button class="btn-pill" onclick="filter('Fit-Calça', this)">Legging</button>
     </div>
 
-    <div class="view-container">
-        <section id="pdv" class="view-section active">
-            <div class="products-panel">
-                <div class="filters-bar">
-                    <button class="btn-filter active" onclick="filterPDV('todos', this)">Todos</button>
-                    <button class="btn-filter" onclick="filterPDV('Sutiã', this)">Sutiãs</button>
-                    <button class="btn-filter" onclick="filterPDV('Calcinha', this)">Calcinhas</button>
-                    <button class="btn-filter" onclick="filterPDV('Conjunto', this)">Conjuntos</button>
-                    <button class="btn-filter btn-filter-fit" onclick="filterPDV('Fit-Top', this)">Top Fit</button>
-                    <button class="btn-filter btn-filter-fit" onclick="filterPDV('Fit-Short', this)">Short Fit</button>
-                    <button class="btn-filter btn-filter-fit" onclick="filterPDV('Fit-Calça', this)">Legging</button>
-                    <button class="btn-filter btn-filter-fit" onclick="filterPDV('Fit-Macacão', this)">Macacão</button>
-                    <button class="btn-filter btn-filter-fit" onclick="filterPDV('Fit-Macaquinho', this)">Macaquinho</button>
-                </div>
-                <div style="display:flex; gap:10px; margin: 10px 0;">
-                    <input type="text" id="pdv-search" placeholder="🔍 Buscar..." onkeyup="renderPDV()" style="flex:1; border-radius:30px; margin:0;">
-                    <button class="btn btn-pink" onclick="openBuilder()" style="border-radius:30px;">👙 Montar</button>
-                </div>
-                <div id="pdv-grid" class="product-grid"></div>
-            </div>
-        </section>
+    <div style="display:flex; gap:10px; margin-bottom:15px;">
+        <input type="text" id="search" placeholder="Buscar..." onkeyup="renderPDV()" style="margin:0; flex:1;">
+        <button onclick="openBuilder()" style="background:var(--primary); color:white; border:none; border-radius:8px; width:50px;">👙</button>
+    </div>
 
-        <section id="clientes" class="view-section">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                <h2>Clientes</h2>
-                <button class="btn btn-primary" onclick="openModal('modal-cliente')">+ Novo</button>
-            </div>
-            <input type="text" id="search-cli" placeholder="Buscar..." onkeyup="renderCustomers()">
-            <div class="table-responsive">
-                <table><tbody id="table-cli"></tbody></table>
-            </div>
-        </section>
+    <div id="grid" class="product-grid"></div>
+</div>
 
-        <section id="estoque" class="view-section">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                <h2>Estoque</h2>
-                <button class="btn btn-primary" onclick="switchTab('cadastro')">+ Item</button>
-            </div>
-            <input type="text" id="stock-search" placeholder="Pesquisar..." onkeyup="renderStock()">
-            <div class="table-responsive">
-                <table><tbody id="table-stock"></tbody></table>
-            </div>
-        </section>
+<div id="clientes" class="view-section">
+    <div class="top-bar"><h2>Clientes</h2><button onclick="openModal('modal-cli')" style="background:none; border:1px solid #ddd; padding:5px 15px; border-radius:20px;">+ Novo</button></div>
+    <input type="text" id="search-cli" placeholder="Buscar..." onkeyup="renderCli()">
+    <div class="card"><table id="table-cli"></table></div>
+</div>
 
-        <section id="financeiro" class="view-section">
-            <h2>Financeiro</h2>
-            <div class="kpi-grid">
-                <div class="kpi-card" style="border-color:var(--success);"><div class="kpi-info"><h3>Faturamento</h3><div class="value">R$ <span id="fin-total">0.00</span></div></div></div>
-                <div class="kpi-card" style="border-color:var(--info);"><div class="kpi-info"><h3>Vendas</h3><div class="value"><span id="fin-count">0</span></div></div></div>
-                <div class="kpi-card" style="border-color:var(--purple);"><div class="kpi-info"><h3>Ticket Médio</h3><div class="value">R$ <span id="fin-ticket">0.00</span></div></div></div>
+<div id="estoque" class="view-section">
+    <div class="top-bar"><h2>Estoque</h2></div>
+    <div class="card">
+        <h3>Novo Produto</h3>
+        <form onsubmit="saveProd(event)">
+            <label>Modelo</label><input type="text" id="cad-name" required>
+            <div style="display:flex; gap:10px;">
+                <select id="cad-type"><option value="Sutiã">Sutiã</option><option value="Calcinha">Calcinha</option><option value="Conjunto">Conjunto</option><option value="Fit-Top">Top Fit</option><option value="Fit-Calça">Legging</option></select>
+                <select id="cad-size"><option value="P">P</option><option value="M">M</option><option value="G">G</option><option value="GG">GG</option></select>
             </div>
-            <div style="background:white; padding:20px; border-radius:8px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                    <h3>Histórico</h3>
-                    <button class="btn btn-dark btn-sm" onclick="exportReport()">📄 Baixar TXT</button>
-                </div>
-                <div class="table-responsive" style="max-height:300px;">
-                    <table><thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Pag</th><th>Valor</th></tr></thead><tbody id="table-sales"></tbody></table>
-                </div>
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="cad-price" placeholder="Preço" step="0.01" required>
+                <input type="number" id="cad-qty" placeholder="Qtd" required>
             </div>
-        </section>
-
-        <section id="cadastro" class="view-section">
-            <h2>Novo Produto</h2>
-            <div class="form-card">
-                <form onsubmit="saveProduct(event)">
-                    <label>Modelo</label><input type="text" id="cad-name" required>
-                    <div class="form-row">
-                        <div>
-                            <label>Categoria</label>
-                            <select id="cad-type">
-                                <optgroup label="Moda Praia">
-                                    <option value="Sutiã">Sutiã (Biquíni)</option>
-                                    <option value="Calcinha">Calcinha</option>
-                                    <option value="Conjunto">Conjunto</option>
-                                    <option value="Saida">Saída de Praia</option>
-                                </optgroup>
-                                <optgroup label="Fitness">
-                                    <option value="Fit-Top">Top Fit</option>
-                                    <option value="Fit-Short">Short Fit</option>
-                                    <option value="Fit-Calça">Legging</option>
-                                    <option value="Fit-Macacão">Macacão</option>
-                                    <option value="Fit-Macaquinho">Macaquinho</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Tamanho</label>
-                            <select id="cad-size"><option value="P">P</option><option value="M">M</option><option value="G">G</option><option value="GG">GG</option><option value="U">Único</option></select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div><label>Preço</label><input type="number" id="cad-price" step="0.01" required></div>
-                        <div><label>Qtd</label><input type="number" id="cad-qty" required></div>
-                    </div>
-                    <label>Foto</label><input type="file" accept="image/*" onchange="processImage(this, 'new')">
-                    <div style="width:80px;height:80px;background:#eee;margin-top:10px;"><img id="cad-preview" style="width:100%;height:100%;object-fit:cover;display:none;"></div>
-                    <button class="btn btn-success" style="width:100%; margin-top:20px;">SALVAR NA NUVEM</button>
-                </form>
-            </div>
-        </section>
+            <input type="file" onchange="procImg(this, 'new')" style="padding:5px;">
+            <img id="cad-prev" style="width:60px; height:60px; object-fit:cover; display:none; border-radius:6px; margin-bottom:10px;">
+            <button class="btn btn-success">SALVAR</button>
+        </form>
+    </div>
+    <div class="card">
+        <h3>Lista</h3>
+        <input type="text" id="search-stk" placeholder="Filtrar..." onkeyup="renderStk()">
+        <table id="table-stk"></table>
     </div>
 </div>
 
-<div class="shell-cart-btn" onclick="toggleCartDrawer()">
-    <svg class="shell-icon" viewBox="0 0 24 24"><path d="M12,2C7.03,2 3,6.03 3,11C3,14.53 5.06,17.59 8.08,19C7.79,19.53 7.6,20.14 7.6,20.8C7.6,22 8.5,23 9.7,23C10.5,23 11.23,22.5 11.6,21.8H12.4C12.77,22.5 13.5,23 14.3,23C15.5,23 16.4,22 16.4,20.8C16.4,20.14 16.21,19.53 15.92,19C18.94,17.59 21,14.53 21,11C21,6.03 16.97,2 12,2M12,4C14.5,4 16.71,5.33 17.92,7.34L12,18L6.08,7.34C7.29,5.33 9.5,4 12,4Z"/></svg>
+<div id="finan" class="view-section">
+    <div class="top-bar"><h2>Financeiro</h2></div>
+    <div class="kpi-box">
+        <div class="kpi"><small>Faturamento</small><br><b style="font-size:1.2rem;">R$ <span id="kpi-fat">0.00</span></b></div>
+        <div class="kpi"><small>Vendas</small><br><b style="font-size:1.2rem;" id="kpi-count">0</b></div>
+    </div>
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><b>Histórico</b> <button onclick="exportTxt()" style="border:none; background:#eee; padding:5px 10px; border-radius:5px;">📥 TXT</button></div>
+        <div style="max-height:300px; overflow-y:auto;">
+            <table id="table-sales"></table>
+        </div>
+    </div>
+</div>
+
+<div class="cart-float" onclick="toggleCart()">
+    <span style="font-size:1.5rem;">🛒</span>
     <div class="cart-badge" id="cart-count">0</div>
 </div>
 
-<div class="cart-drawer-overlay" id="cart-overlay" onclick="toggleCartDrawer()"></div>
-<div class="cart-drawer" id="cart-drawer">
-    <div class="drawer-header"><h3>Carrinho</h3><button onclick="toggleCartDrawer()" style="background:none;border:none;font-size:1.5rem;">✕</button></div>
-    <div class="drawer-body" id="cart-list"></div>
-    <div class="drawer-footer">
-        <div class="total-display">R$ <span id="cart-total">0.00</span></div>
-        <button class="btn btn-success" style="width:100%;" onclick="openCheckout()">FINALIZAR</button>
-        <button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="clearCart()">LIMPAR</button>
-    </div>
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+<div class="drawer" id="drawer-cart">
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3>Carrinho</h3> <span onclick="closeAll()" style="font-size:1.5rem;">✕</span></div>
+    <div id="cart-items" style="max-height:40vh; overflow-y:auto; margin-bottom:15px;"></div>
+    <div style="font-size:1.3rem; font-weight:bold; text-align:right; margin-bottom:15px;">Total: R$ <span id="cart-total">0.00</span></div>
+    <button class="btn btn-success" onclick="openModal('modal-pay')">FINALIZAR VENDA</button>
+    <button class="btn btn-danger" onclick="cart=[];renderCart();closeAll()">LIMPAR</button>
 </div>
 
-<div id="modal-checkout" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-header"><h3>Finalizar</h3><button onclick="closeModal('modal-checkout')" style="background:none;border:none;">✕</button></div>
-        <h1 style="text-align:center; color:var(--primary);">R$ <span id="chk-total">0.00</span></h1>
-        <label>Pagamento</label>
-        <select id="chk-method"><option value="Pix">Pix</option><option value="Crédito">Crédito</option><option value="Débito">Débito</option><option value="Dinheiro">Dinheiro</option></select>
-        <label>Cliente</label>
-        <input type="text" id="chk-search-cli" placeholder="Buscar..." onkeyup="searchCheckoutClient()">
-        <div id="chk-results" style="border:1px solid #eee; display:none;"></div>
-        <div id="chk-selected-cli" style="background:#e0f2f1; padding:10px; margin-bottom:15px; display:none;"></div>
-        <button class="btn btn-success" style="width:100%;" onclick="finishSale()">CONFIRMAR</button>
-    </div>
+<div class="modal" id="modal-pay" style="display:none;">
+    <h3>Pagamento</h3>
+    <h1 style="text-align:center; color:var(--primary);">R$ <span id="pay-total">0.00</span></h1>
+    <select id="pay-method"><option>Pix</option><option>Crédito</option><option>Débito</option><option>Dinheiro</option></select>
+    <input type="text" id="pay-cli" placeholder="Buscar Cliente..." onkeyup="findCliPay()">
+    <div id="pay-cli-list" style="max-height:100px; overflow-y:auto; border:1px solid #eee;"></div>
+    <button class="btn btn-success" onclick="finish()">CONFIRMAR</button>
 </div>
 
-<div id="modal-builder" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-header"><h3>Montar Biquíni</h3><button onclick="closeModal('modal-builder')" style="background:none;border:none;">✕</button></div>
-        <div class="builder-grid">
-            <div><h4>Top</h4><div id="list-tops" class="b-list"></div></div>
-            <div><h4>Calcinha</h4><div id="list-bottoms" class="b-list"></div></div>
-        </div>
-        <div style="margin-top:15px; font-weight:bold; display:flex; justify-content:space-between;">
-            <div id="build-summary">...</div>
-            <div style="color:var(--primary);">R$ <span id="build-total">0.00</span></div>
-        </div>
-        <button class="btn btn-pink" style="width:100%; margin-top:15px;" onclick="addComboToCart()">ADICIONAR</button>
-    </div>
+<div class="modal" id="modal-cli" style="display:none;">
+    <h3>Novo Cliente</h3>
+    <input id="new-cli-name" placeholder="Nome">
+    <input id="new-cli-phone" placeholder="WhatsApp">
+    <button class="btn btn-primary" onclick="saveCli()">Salvar</button>
 </div>
 
-<div id="modal-cliente" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-header"><h3>Novo Cliente</h3><button onclick="closeModal('modal-cliente')" style="background:none;border:none;">✕</button></div>
-        <form onsubmit="saveCustomer(event)">
-            <label>Nome</label><input type="text" id="cli-name" required>
-            <label>Zap</label><input type="text" id="cli-phone" required>
-            <button class="btn btn-primary" style="width:100%;">Salvar</button>
-        </form>
-    </div>
+<div class="modal" id="modal-build" style="display:none; width:95%;">
+    <h3>Montar Biquíni</h3>
+    <p>Escolha o Top:</p>
+    <div class="builder-row" id="row-tops"></div>
+    <p>Escolha a Calcinha:</p>
+    <div class="builder-row" id="row-bots"></div>
+    <div style="margin-top:15px; text-align:right;"><b>Total: R$ <span id="build-total">0.00</span></b></div>
+    <button class="btn btn-pink" onclick="addBuild()">ADICIONAR AO CARRINHO</button>
 </div>
 
-<div id="modal-edit" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-header"><h3>Editar</h3><button onclick="closeModal('modal-edit')" style="background:none;border:none;">✕</button></div>
-        <form onsubmit="saveEdit(event)">
-            <input type="hidden" id="edit-id">
-            <label>Nome</label><input type="text" id="edit-name">
-            <div class="form-row">
-                <div><label>Preço</label><input type="number" id="edit-price" step="0.01"></div>
-                <div><label>Qtd</label><input type="number" id="edit-qty"></div>
-            </div>
-            <div class="form-row">
-                <div><label>Tipo</label><select id="edit-type"><option value="Sutiã">Sutiã</option><option value="Calcinha">Calcinha</option><option value="Fit-Top">Top Fit</option><option value="Fit-Calça">Legging</option></select></div>
-                <div><label>Tam</label><select id="edit-size"><option value="P">P</option><option value="M">M</option><option value="G">G</option></select></div>
-            </div>
-            <label>Foto</label><input type="file" onchange="processImage(this, 'edit')">
-            <div style="height:80px; margin-top:10px;"><img id="edit-preview" style="height:100%;"></div>
-            <button class="btn btn-info" style="width:100%; margin-top:15px;">Salvar</button>
-        </form>
-    </div>
+<div class="modal" id="modal-edit" style="display:none;">
+    <h3>Editar</h3>
+    <input type="hidden" id="edit-id">
+    <input id="edit-name">
+    <div style="display:flex; gap:10px;"><input id="edit-price" type="number"><input id="edit-qty" type="number"></div>
+    <button class="btn btn-primary" onclick="saveEdit()">Atualizar</button>
+    <button class="btn btn-danger" onclick="delProd()" style="margin-top:5px;">Excluir</button>
 </div>
+
+<nav class="bottom-nav">
+    <button class="nav-btn active" onclick="nav('pdv', this)"><span>🛒</span>PDV</button>
+    <button class="nav-btn" onclick="nav('clientes', this)"><span>👥</span>Clientes</button>
+    <button class="nav-btn" onclick="nav('estoque', this)"><span>📦</span>Estoque</button>
+    <button class="nav-btn" onclick="nav('finan', this)"><span>💰</span>Finan</button>
+</nav>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-    // --- SUAS CHAVES DO FIREBASE ---
+    // --- COLE SUA CHAVE AQUI ---
     const firebaseConfig = {
       apiKey: "AIzaSyBotDA6areUMSRrXlSK3phr9DMbq6SD2YE",
       authDomain: "litoral-brasil-estoque.firebaseapp.com",
@@ -328,206 +218,191 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // --- VARIÁVEIS GLOBAIS ---
-    let inventory = []; let customers = []; let salesHistory = [];
-    let cart = []; let tempImg = null; let editImg = null;
-    let selectedTop = null; let selectedBottom = null; let selectedClient = null;
-    const NO_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E";
+    // --- STATE ---
+    let inv=[], cli=[], sales=[], cart=[];
+    let selTop=null, selBot=null, selCli=null, tmpImg=null;
+    const NO_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3C/svg%3E";
 
-    window.onload = function() {
-        document.getElementById('date-display').innerText = new Date().toLocaleDateString('pt-BR');
-        // Listeners com proteção contra dados vazios
-        db.collection("inventory").onSnapshot((qs) => { 
-            inventory=[]; 
-            qs.forEach(d => inventory.push({...d.data(), id:d.id})); 
-            renderPDV(); renderStock(); 
+    // --- INIT (CORRIGIDO: Removida a linha que travava o site) ---
+    window.onload = () => {
+        // Escuta o banco de dados
+        db.collection("inventory").onSnapshot(s=>{
+            inv=[]; 
+            s.forEach(d=>inv.push({...d.data(),id:d.id}));
+            renderPDV();
+            renderStk();
         });
-        db.collection("customers").onSnapshot((qs) => { 
-            customers=[]; 
-            qs.forEach(d => customers.push({...d.data(), id:d.id})); 
-            renderCustomers(); 
+        db.collection("customers").onSnapshot(s=>{
+            cli=[];
+            s.forEach(d=>cli.push({...d.data(),id:d.id}));
+            renderCli();
         });
-        db.collection("sales").orderBy("timestamp", "desc").limit(50).onSnapshot((qs) => { 
-            salesHistory=[]; 
-            qs.forEach(d => salesHistory.push({...d.data(), id:d.id})); 
-            renderFinancials(); 
+        db.collection("sales").orderBy("ts","desc").limit(50).onSnapshot(s=>{
+            sales=[];
+            s.forEach(d=>sales.push({...d.data(),id:d.id}));
+            renderFin();
         });
-    }
+    };
 
-    // --- NAVEGAÇÃO ---
-    function switchTab(id) {
-        if(id === 'financeiro' && prompt("Senha:") !== 'litorallu') return;
-        document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
+    // --- NAV ---
+    function nav(id, btn) {
+        if(id==='finan' && prompt('Senha:')!=='admin') return;
+        document.querySelectorAll('.view-section').forEach(d=>d.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        document.getElementById('btn-'+id).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
     }
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); document.getElementById(id).style.display='none'; }
-    function openModal(id) { document.getElementById(id).classList.add('open'); document.getElementById(id).style.display='block'; }
-
-    // --- FUNÇÕES DB ---
-    function saveProduct(e) {
-        e.preventDefault();
-        const p = {
-            name: document.getElementById('cad-name').value,
-            type: document.getElementById('cad-type').value,
-            size: document.getElementById('cad-size').value,
-            price: parseFloat(document.getElementById('cad-price').value),
-            qty: parseInt(document.getElementById('cad-qty').value),
-            img: tempImg, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        db.collection("inventory").add(p).then(() => { alert('Salvo!'); e.target.reset(); tempImg=null; document.getElementById('cad-preview').style.display='none'; });
-    }
-    function deleteItem(id) { if(confirm('Apagar?')) db.collection("inventory").doc(id).delete(); }
-    function saveEdit(e) {
-        e.preventDefault(); const id = document.getElementById('edit-id').value;
-        const up = {
-            name: document.getElementById('edit-name').value,
-            price: parseFloat(document.getElementById('edit-price').value),
-            qty: parseInt(document.getElementById('edit-qty').value),
-            type: document.getElementById('edit-type').value,
-            size: document.getElementById('edit-size').value
-        };
-        if(editImg) up.img = editImg;
-        db.collection("inventory").doc(id).update(up).then(() => closeModal('modal-edit'));
-    }
-    function saveCustomer(e) { e.preventDefault(); db.collection("customers").add({ name: document.getElementById('cli-name').value, phone: document.getElementById('cli-phone').value, cashback: 0 }).then(() => { closeModal('modal-cliente'); alert('Salvo!'); }); }
-
-    function finishSale() {
-        const batch = db.batch();
-        cart.forEach(c => { const ref = db.collection("inventory").doc(c.id); const item = inventory.find(i=>i.id===c.id); if(item) batch.update(ref, {qty: item.qty - c.cartQty}); });
-        const tot = parseFloat(document.getElementById('chk-total').innerText);
-        const refSale = db.collection("sales").doc();
-        batch.set(refSale, { date: new Date().toLocaleString(), client: selectedClient?selectedClient.name:'Avulso', total: tot, method: document.getElementById('chk-method').value, items: cart.map(x=>x.name).join(', '), timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-        if(selectedClient) { const refCli = db.collection("customers").doc(selectedClient.id); batch.update(refCli, {cashback: (selectedClient.cashback||0)+(tot*0.02)}); }
-        batch.commit().then(() => { alert('Venda OK!'); clearCart(); closeModal('modal-checkout'); });
-    }
-
-    // --- RELATÓRIO TXT ---
-    function exportReport() {
-        if(salesHistory.length === 0) return alert("Sem dados.");
-        let txt = "====================================\n";
-        txt += "   LITORAL BRASIL - RELATÓRIO\n";
-        txt += "====================================\n\n";
-        salesHistory.forEach(s => {
-            txt += `DATA: ${s.date}\nCLIENTE: ${s.client}\nITENS: ${s.items}\nPAG: ${s.method} | R$ ${s.total.toFixed(2)}\n------------------------------------\n`;
-        });
-        const tot = salesHistory.reduce((a,b)=>a+b.total,0);
-        txt += `\nTOTAL GERAL: R$ ${tot.toFixed(2)}\nVENDAS: ${salesHistory.length}`;
-        const blob = new Blob([txt], { type: 'text/plain;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_${new Date().toLocaleDateString().replace(/\//g,'-')}.txt`;
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
-    }
-
-    // --- UI HELPERS ---
-    function processImage(input, mode) {
-        if(input.files[0]) {
-            const r = new FileReader();
-            r.onload = function(e) {
-                const img = new Image(); img.onload = function() {
-                    const c = document.createElement('canvas'); const ctx = c.getContext('2d');
-                    c.width = 300; c.height = (img.height * 300) / img.width;
-                    ctx.drawImage(img, 0, 0, c.width, c.height);
-                    const d = c.toDataURL('image/jpeg', 0.7);
-                    if(mode === 'new') { tempImg = d; document.getElementById('cad-preview').src = d; document.getElementById('cad-preview').style.display = 'block'; }
-                    else { editImg = d; document.getElementById('edit-preview').src = d; }
-                }; img.src = e.target.result;
-            }; r.readAsDataURL(input.files[0]);
-        }
-    }
-
-    let pdvFilter = 'todos';
-    function filterPDV(t, b) { pdvFilter = t; document.querySelectorAll('.btn-filter').forEach(x => x.classList.remove('active')); if(b) b.classList.add('active'); renderPDV(); }
     
-    // --- FUNÇÕES DE RENDERIZAÇÃO BLINDADAS (Aqui estava o erro) ---
+    function closeAll() {
+        document.querySelectorAll('.modal, .drawer, .overlay').forEach(e=>e.classList.remove('open') || (e.style.display='none'));
+    }
+    function openModal(id) { document.getElementById('overlay').style.display='block'; document.getElementById(id).style.display='block'; }
+    function toggleCart() { 
+        document.getElementById('overlay').style.display='block'; 
+        document.getElementById('drawer-cart').classList.add('open'); 
+        renderCart(); 
+    }
+
+    // --- PDV (BLINDADO) ---
+    let catFilter = 'todos';
+    function filter(c, b) { catFilter=c; document.querySelectorAll('.btn-pill').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderPDV(); }
+    
     function renderPDV() {
-        const grid = document.getElementById('pdv-grid'); 
-        const term = document.getElementById('pdv-search').value.toLowerCase(); 
-        grid.innerHTML = '';
-        inventory.filter(i => {
-            // PROTEÇÃO: Se o nome for vazio/nulo, usa ''
+        const t = document.getElementById('search').value.toLowerCase();
+        const g = document.getElementById('grid'); g.innerHTML='';
+        inv.filter(i=>{
+            const name = i.name ? i.name.toLowerCase() : ''; // Proteção contra nulos
+            return (catFilter==='todos'||i.type===catFilter) && name.includes(t);
+        }).forEach(i=>{
+            const op = i.qty<1 ? 0.5 : 1;
+            g.innerHTML += `<div class="product-card" style="opacity:${op}" onclick="addCart('${i.id}')">
+                <div style="position:absolute;top:5px;right:5px;background:var(--primary);color:white;border-radius:50%;width:25px;height:25px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;">${i.size}</div>
+                <img src="${i.img||NO_IMG}">
+                <div class="info-box"><b>${i.name}</b><br><small>${i.type}</small><br><b style="color:var(--primary)">R$ ${i.price}</b></div>
+            </div>`;
+        });
+    }
+
+    // --- CART ---
+    function addCart(id) {
+        const i = inv.find(x=>x.id===id); if(!i || i.qty<1) return alert('Sem estoque');
+        const has = cart.find(x=>x.id===id); if(has) has.q++; else cart.push({...i, q:1});
+        updBadge();
+    }
+    function updBadge() { document.getElementById('cart-count').innerText = cart.reduce((a,b)=>a+b.q,0); }
+    function renderCart() {
+        const d = document.getElementById('cart-items'); d.innerHTML=''; let t=0;
+        cart.forEach((c,ix)=>{
+            t+=c.price*c.q;
+            d.innerHTML+=`<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #eee;padding:10px 0;">
+                <div><b>${c.name}</b> (${c.size})<br>${c.q}x R$ ${c.price}</div>
+                <button onclick="cart.splice(${ix},1);renderCart();updBadge()" style="color:red;border:none;background:none;">🗑️</button>
+            </div>`;
+        });
+        document.getElementById('cart-total').innerText = document.getElementById('pay-total').innerText = t.toFixed(2);
+    }
+    
+    function finish() {
+        if(!cart.length) return;
+        const b = db.batch();
+        cart.forEach(c=>{ b.update(db.collection('inventory').doc(c.id), {qty: c.qty-c.q}); });
+        const tot = parseFloat(document.getElementById('cart-total').innerText);
+        b.set(db.collection('sales').doc(), {
+            date: new Date().toLocaleString(), cli: selCli?selCli.name:'Avulso', tot: tot,
+            pay: document.getElementById('pay-method').value, items: cart.map(x=>x.name).join(', '), ts: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        b.commit().then(()=>{ alert('Venda OK!'); cart=[]; closeAll(); updBadge(); });
+    }
+
+    // --- ADMIN ---
+    function procImg(el, m) {
+        const f = el.files[0]; if(!f) return;
+        const r = new FileReader(); r.onload=e=>{
+            tmpImg = e.target.result;
+            if(m==='new') { document.getElementById('cad-prev').src=tmpImg; document.getElementById('cad-prev').style.display='block'; }
+        }; r.readAsDataURL(f);
+    }
+    function saveProd(e) {
+        e.preventDefault();
+        db.collection('inventory').add({
+            name: document.getElementById('cad-name').value, type: document.getElementById('cad-type').value,
+            size: document.getElementById('cad-size').value, price: parseFloat(document.getElementById('cad-price').value),
+            qty: parseInt(document.getElementById('cad-qty').value), img: tmpImg
+        }).then(()=>{ alert('Salvo!'); e.target.reset(); tmpImg=null; document.getElementById('cad-prev').style.display='none'; });
+    }
+    
+    function renderStk() {
+        const t = document.getElementById('search-stk').value.toLowerCase();
+        const tb = document.getElementById('table-stk'); tb.innerHTML='';
+        inv.filter(i=>{
             const name = i.name ? i.name.toLowerCase() : '';
-            return (pdvFilter==='todos'||i.type===pdvFilter) && name.includes(term);
-        }).forEach(i => {
-            const op = i.qty===0?'0.5':'1';
-            grid.innerHTML += `<div class="product-card" style="opacity:${op}" onclick="addToCart('${i.id}')"><div class="size-badge">${i.size}</div><img src="${i.img||NO_IMG}"><div style="padding:10px;font-size:0.9rem;"><b>${i.name}</b><br><small>${i.type}</small><br><span style="color:var(--primary);font-weight:bold;">R$ ${i.price.toFixed(2)}</span></div></div>`;
+            return name.includes(t);
+        }).forEach(i=>{
+            tb.innerHTML+=`<tr><td>${i.name} (${i.size})</td><td>${i.qty}</td><td onclick="edit('${i.id}')">✏️</td></tr>`;
+        });
+    }
+    function edit(id) {
+        const i = inv.find(x=>x.id===id);
+        document.getElementById('edit-id').value=id; document.getElementById('edit-name').value=i.name;
+        document.getElementById('edit-price').value=i.price; document.getElementById('edit-qty').value=i.qty;
+        openModal('modal-edit');
+    }
+    function saveEdit() {
+        const id = document.getElementById('edit-id').value;
+        db.collection('inventory').doc(id).update({
+            name: document.getElementById('edit-name').value, price: parseFloat(document.getElementById('edit-price').value),
+            qty: parseInt(document.getElementById('edit-qty').value)
+        }).then(()=>closeAll());
+    }
+    function delProd() { if(confirm('Apagar?')) db.collection('inventory').doc(document.getElementById('edit-id').value).delete().then(()=>closeAll()); }
+
+    // --- CLIENTS & BUILDER ---
+    function saveCli() { db.collection('customers').add({name:document.getElementById('new-cli-name').value, phone:document.getElementById('new-cli-phone').value}).then(()=>closeAll()); }
+    function renderCli() { 
+        const tb = document.getElementById('table-cli'); tb.innerHTML=''; 
+        cli.filter(c=>{
+            const name = c.name ? c.name.toLowerCase() : '';
+            return name.includes(document.getElementById('search-cli').value.toLowerCase());
+        }).forEach(c=>{
+            tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.phone}</td></tr>`;
         });
     }
     
-    function addToCart(id) {
-        const item = inventory.find(i=>i.id===id); if(item.qty<=0) return alert('Sem Estoque');
-        const ex = cart.find(c=>c.id===id); if(ex) { if(ex.cartQty>=item.qty) return alert('Max'); ex.cartQty++; } else cart.push({...item, cartQty:1});
-        updateCartCount(); const btn = document.querySelector('.shell-cart-btn'); btn.style.transform="scale(1.1)"; setTimeout(()=>btn.style.transform="scale(1)", 200);
-    }
-    function updateCartCount() { document.getElementById('cart-count').innerText = cart.reduce((a,c)=>a+c.cartQty,0); }
-    function toggleCartDrawer() { const d = document.getElementById('cart-drawer'); const o = document.getElementById('cart-overlay'); if(d.classList.contains('open')) { d.classList.remove('open'); o.style.display='none'; } else { d.classList.add('open'); o.style.display='block'; renderCart(); } }
-    function renderCart() {
-        const d = document.getElementById('cart-list'); d.innerHTML = ''; let tot = 0;
-        cart.forEach((c, idx) => { tot+=c.price*c.cartQty; d.innerHTML += `<div class="cart-item"><div><b>${c.name}</b> (${c.size})<br>${c.cartQty}x R$ ${c.price.toFixed(2)}</div><button onclick="cart.splice(${idx},1);renderCart();updateCartCount();" style="color:red;border:none;background:none;">🗑️</button></div>`; });
-        document.getElementById('cart-total').innerText = tot.toFixed(2);
-    }
-    function clearCart() { cart=[]; renderCart(); updateCartCount(); }
-    
-    function openCheckout() { if(cart.length===0) return; toggleCartDrawer(); document.getElementById('chk-total').innerText = document.getElementById('cart-total').innerText; selectedClient=null; document.getElementById('chk-selected-cli').style.display='none'; openModal('modal-checkout'); }
-    function searchCheckoutClient() {
-        const t = document.getElementById('chk-search-cli').value.toLowerCase(); const r = document.getElementById('chk-results'); r.innerHTML=''; r.style.display='block';
-        customers.filter(c => {
+    function findCliPay() {
+        const t = document.getElementById('pay-cli').value.toLowerCase();
+        const l = document.getElementById('pay-cli-list'); l.innerHTML='';
+        cli.filter(c=>{
             const name = c.name ? c.name.toLowerCase() : '';
             return name.includes(t);
-        }).forEach(c=>{ r.innerHTML+=`<div style="padding:10px;cursor:pointer;" onclick="selectClient('${c.id}')">${c.name}</div>`; });
-    }
-    function selectClient(id) { selectedClient = customers.find(c=>c.id===id); document.getElementById('chk-selected-cli').innerText='Cliente: '+selectedClient.name; document.getElementById('chk-selected-cli').style.display='block'; document.getElementById('chk-results').style.display='none'; }
-
-    function renderStock() { 
-        const tb = document.getElementById('table-stock'); 
-        const t = document.getElementById('stock-search').value.toLowerCase(); 
-        tb.innerHTML=''; 
-        inventory.filter(i => {
-            const name = i.name ? i.name.toLowerCase() : '';
-            return name.includes(t);
-        }).forEach(i=>{ tb.innerHTML+=`<tr><td>${i.name}</td><td>${i.size}</td><td>R$ ${i.price}</td><td>${i.qty}</td><td><button onclick="openEdit('${i.id}')">✏️</button> <button onclick="deleteItem('${i.id}')">🗑️</button></td></tr>`; }); 
-    }
-    
-    function openEdit(id) {
-        const i = inventory.find(x=>x.id===id); if(!i)return;
-        document.getElementById('edit-id').value=i.id; document.getElementById('edit-name').value=i.name; document.getElementById('edit-price').value=i.price; document.getElementById('edit-qty').value=i.qty;
-        if(i.type) document.getElementById('edit-type').value=i.type; if(i.size) document.getElementById('edit-size').value=i.size;
-        editImg=i.img; document.getElementById('edit-preview').src=i.img||NO_IMG; openModal('modal-edit');
+        }).forEach(c=>{
+            l.innerHTML+=`<div onclick="selCli={name:'${c.name}',id:'${c.id}'};document.getElementById('pay-cli').value='${c.name}';this.parentElement.innerHTML=''" style="padding:5px;border-bottom:1px solid #eee;">${c.name}</div>`;
+        });
     }
 
-    function renderCustomers() { 
-        const tb = document.getElementById('table-cli'); 
-        const t = document.getElementById('search-cli').value.toLowerCase(); 
-        tb.innerHTML=''; 
-        customers.filter(c => {
-            const name = c.name ? c.name.toLowerCase() : '';
-            return name.includes(t);
-        }).forEach(c=>{ tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.phone}</td><td>R$ ${(c.cashback||0).toFixed(2)}</td></tr>`; }); 
+    function openBuilder() { 
+        openModal('modal-build'); selTop=null; selBot=null; 
+        const rt = document.getElementById('row-tops'); const rb = document.getElementById('row-bots'); rt.innerHTML=''; rb.innerHTML='';
+        inv.filter(i=>i.type==='Sutiã'&&i.qty>0).forEach(i=>rt.innerHTML+=`<div class="build-item" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}"><br>${i.name}</div>`);
+        inv.filter(i=>i.type==='Calcinha'&&i.qty>0).forEach(i=>rb.innerHTML+=`<div class="build-item" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}"><br>${i.name}</div>`);
     }
-    
-    function renderFinancials() {
-        const tot = salesHistory.reduce((a,b)=>a+b.total,0); document.getElementById('fin-total').innerText=tot.toFixed(2); document.getElementById('fin-count').innerText=salesHistory.length;
-        const avg = salesHistory.length?(tot/salesHistory.length):0; document.getElementById('fin-ticket').innerText=avg.toFixed(2);
+    function selPart(t,id,el) {
+        if(t==='top') selTop = inv.find(x=>x.id===id); else selBot = inv.find(x=>x.id===id);
+        Array.from(el.parentNode.children).forEach(c=>c.classList.remove('selected')); el.classList.add('selected');
+        const tot = (selTop?selTop.price:0) + (selBot?selBot.price:0);
+        document.getElementById('build-total').innerText = tot.toFixed(2);
+    }
+    function addBuild() { if(selTop) addCart(selTop.id); if(selBot) addCart(selBot.id); closeAll(); }
+
+    function renderFin() {
+        const t = sales.reduce((a,b)=>a+b.tot,0); document.getElementById('kpi-fat').innerText=t.toFixed(2); document.getElementById('kpi-count').innerText=sales.length;
         const tb = document.getElementById('table-sales'); tb.innerHTML='';
-        salesHistory.forEach(s => { tb.innerHTML += `<tr><td>${s.date.split(' ')[0]}</td><td>${s.client}</td><td>${s.items.substring(0,20)}</td><td>${s.method}</td><td>R$ ${s.total.toFixed(2)}</td></tr>`; });
+        sales.forEach(s=>tb.innerHTML+=`<tr><td>${s.date.split(' ')[0]}</td><td>${s.cli}</td><td>R$ ${s.tot}</td></tr>`);
     }
-
-    // Builder
-    function openBuilder() { selectedTop=null; selectedBottom=null; openModal('modal-builder'); renderBuilder(); updateBuilder(); }
-    function renderBuilder() {
-        const tops = document.getElementById('list-tops'); const bots = document.getElementById('list-bottoms'); tops.innerHTML=''; bots.innerHTML='';
-        inventory.filter(i=>i.type==='Sutiã'&&i.qty>0).forEach(i=>tops.innerHTML+=`<div class="b-item" onclick="selBuild('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:30px;margin-right:5px;"> ${i.name} (${i.size})</div>`);
-        inventory.filter(i=>i.type==='Calcinha'&&i.qty>0).forEach(i=>bots.innerHTML+=`<div class="b-item" onclick="selBuild('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:30px;margin-right:5px;"> ${i.name} (${i.size})</div>`);
+    function exportTxt() {
+        let txt = "LITORAL BRASIL - VENDAS\n\n";
+        sales.forEach(s=>txt+=`${s.date} | ${s.cli} | R$ ${s.tot.toFixed(2)}\nItem: ${s.items}\n----------------\n`);
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt],{type:'text/plain'})); a.download='vendas.txt'; a.click();
     }
-    function selBuild(side, id, el) {
-        const i = inventory.find(x=>x.id===id); if(side==='top') selectedTop=i; else selectedBottom=i;
-        el.parentElement.querySelectorAll('.b-item').forEach(x=>x.classList.remove('selected')); el.classList.add('selected'); updateBuilder();
-    }
-    function updateBuilder() {
-        let tot=0; let txt=''; if(selectedTop){tot+=selectedTop.price;txt+=`Top: ${selectedTop.name}\n`;} if(selectedBottom){tot+=selectedBottom.price;txt+=`Calcinha: ${selectedBottom.name}`;}
-        document.getElementById('build-summary').innerText=txt||'...'; document.getElementById('build-total').innerText=tot.toFixed(2);
-    }
-    function addComboToCart() { if(selectedTop) addToCart(selectedTop.id); if(selectedBottom) addToCart(selectedBottom.id); closeModal('modal-builder'); }
 </script>
 </body>
 </html>
