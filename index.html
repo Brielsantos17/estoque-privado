@@ -34,7 +34,7 @@
         
         .user-panel { padding: 20px; background: rgba(0,0,0,0.1); text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
 
-        /* --- 2. LAYOUT MOBILE (BARRA INFERIOR) - Inicialmente invisível no PC --- */
+        /* --- 2. LAYOUT MOBILE (BARRA INFERIOR) --- */
         .bottom-nav { display: none; }
 
         /* --- CONTEÚDO PRINCIPAL --- */
@@ -82,16 +82,21 @@
         .cart-float:hover { transform: scale(1.1); }
         .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border: 2px solid white; font-weight: bold; }
 
+        /* LOADING SPINNER (TRAVA DE TELA) */
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .spinner { border: 5px solid rgba(255,255,255,0.3); border-top: 5px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* MODAIS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; }
         .modal-box { background: white; width: 500px; max-width: 90%; padding: 30px; border-radius: 12px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         
+        /* ESTILO DA IMAGEM NO MODAL DE EDIÇÃO */
+        .edit-img-container { text-align: center; margin-bottom: 15px; border: 2px dashed #ddd; padding: 10px; border-radius: 8px; background: #fafafa; }
+        .edit-img-preview { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; background: #eee; display: block; margin: 0 auto 10px; }
+
         .cart-drawer { position: fixed; top: 0; right: -400px; width: 380px; height: 100%; background: white; z-index: 1100; transition: 0.3s; box-shadow: -5px 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .cart-drawer.open { right: 0; }
-
-        /* LOADING SPINNER */
-        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* BUILDER */
         .builder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -103,7 +108,7 @@
         /* --- RESPONSIVIDADE (TRANSFORMA PC EM MOBILE) --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { display: none; } /* Esconde lateral no celular */
+            .sidebar { display: none; }
             
             .bottom-nav {
                 display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
@@ -118,13 +123,14 @@
             .nav-btn-mobile.active { color: var(--gold); border-top: 3px solid var(--gold); }
             .nav-btn-mobile span { font-size: 1.4rem; }
 
-            .main-content { padding-bottom: 70px; } /* Espaço pro menu mobile */
+            .main-content { padding-bottom: 70px; }
             .view-container { padding: 15px; }
             .top-bar { padding: 0 15px; }
             .product-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .product-card img { height: 140px; }
             .cart-float { bottom: 70px; right: 20px; }
             .cart-drawer { width: 100%; right: -100%; }
+            .modal-box { padding: 20px; width: 95%; } /* Modal full width no mobile */
         }
     </style>
 </head>
@@ -236,13 +242,7 @@
                         <div>
                             <label>Tamanho</label>
                             <select id="cad-size">
-                                <option>PP</option>
-                                <option>P</option>
-                                <option>M</option>
-                                <option>G</option>
-                                <option>GG</option>
-                                <option>XG</option>
-                                <option>U</option>
+                                <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option><option>U</option>
                             </select>
                         </div>
                     </div>
@@ -278,9 +278,9 @@
     <div class="cart-badge" id="cart-count">0</div>
 </div>
 
-<div id="loading-overlay" class="overlay" style="z-index: 2000; display: none; flex-direction: column; color: white;">
+<div id="loading-overlay" class="loading-overlay">
     <div class="spinner"></div>
-    <div style="margin-top: 15px; font-weight: bold; font-size: 1.2rem;">Salvando...</div>
+    <div style="font-size: 1.2rem; font-weight: bold;">Salvando... Aguarde.</div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeAll()"></div>
@@ -336,20 +336,30 @@
 </div>
 
 <div id="modal-edit" class="modal-box" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1300; display:none;">
-    <h2 style="margin-top:0;">Editar Produto</h2>
+    <h2 style="margin-top:0; text-align:center;">Editar Produto</h2>
     <form onsubmit="saveEdit(event)">
         <input type="hidden" id="edit-id">
+        
+        <div class="edit-img-container">
+            <img id="edit-preview" class="edit-img-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E">
+            <label style="cursor:pointer; color:var(--primary); font-weight:bold; font-size:0.9rem;">
+                📷 Trocar Foto
+                <input type="file" accept="image/*" style="display:none;" onchange="processImage(this, 'edit')">
+            </label>
+        </div>
+
         <label>Nome</label><input id="edit-name">
         <label>Tamanho</label>
         <select id="edit-size" style="margin-bottom:15px;">
             <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option><option>U</option>
         </select>
-        <div style="display:flex; gap:10px;">
-            <input id="edit-price" type="number" step="0.01">
-            <input id="edit-qty" type="number">
+        <div style="display:flex; gap:15px;">
+            <div style="flex:1"><label>Preço</label><input id="edit-price" type="number" step="0.01"></div>
+            <div style="flex:1"><label>Qtd</label><input id="edit-qty" type="number"></div>
         </div>
-        <button class="btn btn-primary" style="width:100%;">Atualizar</button>
-        <button type="button" class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="deleteItem(document.getElementById('edit-id').value)">Excluir Produto</button>
+        
+        <button class="btn btn-primary" style="width:100%; height:50px; font-size:1.1rem; margin-top:10px;">💾 Atualizar</button>
+        <button type="button" class="btn btn-danger" style="width:100%; margin-top:15px; background:#fff; color:var(--danger); border:1px solid var(--danger);" onclick="deleteItem(document.getElementById('edit-id').value)">🗑️ Excluir Produto</button>
     </form>
 </div>
 
@@ -384,12 +394,8 @@
     // --- NAVEGAÇÃO HÍBRIDA ---
     function nav(id) {
         if(id==='financeiro' && prompt('Senha:')!=='litorallu') return;
-        
-        // Troca as telas
         document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        
-        // Atualiza botões (Lateral e Mobile)
         document.querySelectorAll('.nav-btn-side, .nav-btn-mobile').forEach(b=>b.classList.remove('active'));
         if(document.getElementById('side-'+id)) document.getElementById('side-'+id).classList.add('active');
         if(document.getElementById('mob-'+id)) document.getElementById('mob-'+id).classList.add('active');
@@ -411,6 +417,11 @@
         document.getElementById('overlay').style.display='block';
         document.getElementById('cart-drawer').classList.add('open');
         renderCart();
+    }
+
+    // --- LOADING HELPER ---
+    function setLoading(isLoading) {
+        document.getElementById('loading-overlay').style.display = isLoading ? 'flex' : 'none';
     }
 
     // --- LÓGICA (BLINDADA) ---
@@ -462,6 +473,7 @@
     function selCli(id) { selectedClient=customers.find(c=>c.id===id); document.getElementById('chk-selected-cli').innerText='Cliente: '+selectedClient.name; document.getElementById('chk-selected-cli').style.display='block'; document.getElementById('chk-results').style.display='none'; }
 
     function finishSale() {
+        setLoading(true);
         const b = db.batch();
         cart.forEach(c=>{ b.update(db.collection('inventory').doc(c.id), {qty: c.qty-c.q}); });
         const tot = parseFloat(document.getElementById('chk-total').innerText);
@@ -469,7 +481,7 @@
             date: new Date().toLocaleString(), client: selectedClient?selectedClient.name:'Avulso', total: tot,
             method: document.getElementById('chk-method').value, items: cart.map(x=>x.name).join(', '), timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        b.commit().then(()=>{ alert('Venda Realizada!'); clearCart(); closeAll(); });
+        b.commit().then(()=>{ setLoading(false); alert('Venda Realizada!'); clearCart(); closeAll(); }).catch(err=>{setLoading(false);alert('Erro');});
     }
 
     // --- CRUD ---
@@ -480,7 +492,7 @@
                     const c=document.createElement('canvas'); const x=c.getContext('2d'); c.width=300; c.height=(i.height*300)/i.width; x.drawImage(i,0,0,c.width,c.height);
                     const d=c.toDataURL('image/jpeg',0.7);
                     if(m==='new'){ tempImg=d; document.getElementById('cad-preview').src=d; document.getElementById('cad-preview').style.display='block'; }
-                    else editImg=d;
+                    else { editImg=d; document.getElementById('edit-preview').src=d; }
                 }; i.src=e.target.result;
             }; r.readAsDataURL(input.files[0]);
         }
@@ -488,29 +500,16 @@
     
     function saveProduct(e) {
         e.preventDefault();
-        const btn = e.target.querySelector('button');
-        
-        // BLOQUEIO UI (LOADING)
-        document.getElementById('loading-overlay').style.display = 'flex';
-        btn.disabled = true;
-
+        setLoading(true); // BLOQUEIA TELA
         db.collection('inventory').add({
             name: document.getElementById('cad-name').value, type: document.getElementById('cad-type').value,
             size: document.getElementById('cad-size').value, price: parseFloat(document.getElementById('cad-price').value),
             qty: parseInt(document.getElementById('cad-qty').value), img: tempImg, createdAt: new Date()
         })
         .then(()=>{ 
-            alert('Produto Salvo!'); 
-            e.target.reset(); 
-            tempImg=null; 
-            document.getElementById('cad-preview').style.display='none'; 
+            alert('Produto Salvo!'); e.target.reset(); tempImg=null; document.getElementById('cad-preview').style.display='none'; 
         })
-        .catch(err => alert('Erro: ' + err))
-        .finally(() => {
-            // DESBLOQUEIO UI
-            document.getElementById('loading-overlay').style.display = 'none';
-            btn.disabled = false;
-        });
+        .finally(() => setLoading(false)); // LIBERA TELA
     }
     
     function renderStock() {
@@ -519,28 +518,45 @@
             tb.innerHTML+=`<tr><td>${i.name}</td><td>${i.size}</td><td>${i.price}</td><td>${i.qty}</td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td></tr>`;
         });
     }
+    
     function openEdit(id) {
         const i=inventory.find(x=>x.id===id); 
         document.getElementById('edit-id').value=id; 
         document.getElementById('edit-name').value=i.name;
         document.getElementById('edit-price').value=i.price; 
         document.getElementById('edit-qty').value=i.qty;
-        document.getElementById('edit-size').value = i.size || 'U'; // Carrega o tamanho existente
+        document.getElementById('edit-size').value=i.size || 'U';
+        
         editImg=i.img; 
+        document.getElementById('edit-preview').src=i.img || NO_IMG;
+        
         openModal('modal-edit');
     }
+    
     function saveEdit(e) {
-        e.preventDefault(); const id=document.getElementById('edit-id').value;
+        e.preventDefault(); 
+        setLoading(true); // BLOQUEIA TELA NA EDIÇÃO
+        const id=document.getElementById('edit-id').value;
         const u = { 
             name:document.getElementById('edit-name').value, 
             price:parseFloat(document.getElementById('edit-price').value), 
             qty:parseInt(document.getElementById('edit-qty').value),
-            size:document.getElementById('edit-size').value // Salva o tamanho editado
+            size:document.getElementById('edit-size').value
         };
-        if(editImg) u.img=editImg;
-        db.collection('inventory').doc(id).update(u).then(()=>{ closeAll(); alert('Atualizado!'); });
+        if(editImg) u.img=editImg; // Salva foto nova se tiver
+        
+        db.collection('inventory').doc(id).update(u)
+        .then(()=>{ closeAll(); alert('Atualizado!'); })
+        .catch(err => alert('Erro: ' + err))
+        .finally(() => setLoading(false)); // LIBERA TELA
     }
-    function deleteItem(id){ if(confirm('Excluir este item?')) db.collection('inventory').doc(id).delete().then(()=>{ closeAll(); }); }
+    
+    function deleteItem(id){ 
+        if(confirm('Excluir este item?')) {
+            setLoading(true);
+            db.collection('inventory').doc(id).delete().then(()=>{ closeAll(); }).finally(() => setLoading(false));
+        }
+    }
 
     function saveCustomer(e){ e.preventDefault(); db.collection('customers').add({name:document.getElementById('cli-name').value, phone:document.getElementById('cli-phone').value}).then(()=>{ closeAll(); alert('Cliente Salvo'); }); }
     function renderCustomers(){ const tb=document.getElementById('table-cli'); tb.innerHTML=''; customers.filter(c=>(c.name||'').toLowerCase().includes(document.getElementById('search-cli').value.toLowerCase())).forEach(c=>{ tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.phone}</td></tr>`; }); }
