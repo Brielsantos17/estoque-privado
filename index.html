@@ -75,6 +75,7 @@
         .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; font-size: 1rem; }
         .btn-primary { background: var(--primary); } .btn-success { background: var(--success); }
         .btn-danger { background: var(--danger); } .btn-pink { background: var(--pink); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
 
         /* FLUTUANTES (Carrinho) */
         .cart-float { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 900; cursor: pointer; border: 3px solid white; transition: transform 0.2s; }
@@ -87,6 +88,10 @@
         
         .cart-drawer { position: fixed; top: 0; right: -400px; width: 380px; height: 100%; background: white; z-index: 1100; transition: 0.3s; box-shadow: -5px 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .cart-drawer.open { right: 0; }
+
+        /* LOADING SPINNER */
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* BUILDER */
         .builder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -230,7 +235,15 @@
                         </div>
                         <div>
                             <label>Tamanho</label>
-                            <select id="cad-size"><option>P</option><option>M</option><option>G</option><option>GG</option><option>U</option></select>
+                            <select id="cad-size">
+                                <option>PP</option>
+                                <option>P</option>
+                                <option>M</option>
+                                <option>G</option>
+                                <option>GG</option>
+                                <option>XG</option>
+                                <option>U</option>
+                            </select>
                         </div>
                     </div>
 
@@ -263,6 +276,11 @@
 <div class="cart-float" onclick="toggleCartDrawer()">
     <span style="font-size:1.5rem;">🛒</span>
     <div class="cart-badge" id="cart-count">0</div>
+</div>
+
+<div id="loading-overlay" class="overlay" style="z-index: 2000; display: none; flex-direction: column; color: white;">
+    <div class="spinner"></div>
+    <div style="margin-top: 15px; font-weight: bold; font-size: 1.2rem;">Salvando...</div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeAll()"></div>
@@ -322,6 +340,10 @@
     <form onsubmit="saveEdit(event)">
         <input type="hidden" id="edit-id">
         <label>Nome</label><input id="edit-name">
+        <label>Tamanho</label>
+        <select id="edit-size" style="margin-bottom:15px;">
+            <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option><option>U</option>
+        </select>
         <div style="display:flex; gap:10px;">
             <input id="edit-price" type="number" step="0.01">
             <input id="edit-qty" type="number">
@@ -466,11 +488,29 @@
     
     function saveProduct(e) {
         e.preventDefault();
+        const btn = e.target.querySelector('button');
+        
+        // BLOQUEIO UI (LOADING)
+        document.getElementById('loading-overlay').style.display = 'flex';
+        btn.disabled = true;
+
         db.collection('inventory').add({
             name: document.getElementById('cad-name').value, type: document.getElementById('cad-type').value,
             size: document.getElementById('cad-size').value, price: parseFloat(document.getElementById('cad-price').value),
             qty: parseInt(document.getElementById('cad-qty').value), img: tempImg, createdAt: new Date()
-        }).then(()=>{ alert('Produto Salvo!'); e.target.reset(); tempImg=null; document.getElementById('cad-preview').style.display='none'; });
+        })
+        .then(()=>{ 
+            alert('Produto Salvo!'); 
+            e.target.reset(); 
+            tempImg=null; 
+            document.getElementById('cad-preview').style.display='none'; 
+        })
+        .catch(err => alert('Erro: ' + err))
+        .finally(() => {
+            // DESBLOQUEIO UI
+            document.getElementById('loading-overlay').style.display = 'none';
+            btn.disabled = false;
+        });
     }
     
     function renderStock() {
@@ -480,13 +520,23 @@
         });
     }
     function openEdit(id) {
-        const i=inventory.find(x=>x.id===id); document.getElementById('edit-id').value=id; document.getElementById('edit-name').value=i.name;
-        document.getElementById('edit-price').value=i.price; document.getElementById('edit-qty').value=i.qty;
-        editImg=i.img; openModal('modal-edit');
+        const i=inventory.find(x=>x.id===id); 
+        document.getElementById('edit-id').value=id; 
+        document.getElementById('edit-name').value=i.name;
+        document.getElementById('edit-price').value=i.price; 
+        document.getElementById('edit-qty').value=i.qty;
+        document.getElementById('edit-size').value = i.size || 'U'; // Carrega o tamanho existente
+        editImg=i.img; 
+        openModal('modal-edit');
     }
     function saveEdit(e) {
         e.preventDefault(); const id=document.getElementById('edit-id').value;
-        const u = { name:document.getElementById('edit-name').value, price:parseFloat(document.getElementById('edit-price').value), qty:parseInt(document.getElementById('edit-qty').value) };
+        const u = { 
+            name:document.getElementById('edit-name').value, 
+            price:parseFloat(document.getElementById('edit-price').value), 
+            qty:parseInt(document.getElementById('edit-qty').value),
+            size:document.getElementById('edit-size').value // Salva o tamanho editado
+        };
         if(editImg) u.img=editImg;
         db.collection('inventory').doc(id).update(u).then(()=>{ closeAll(); alert('Atualizado!'); });
     }
