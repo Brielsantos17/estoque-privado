@@ -653,7 +653,7 @@
         r.style.display='block';
         
         r.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(t)).map(c => 
-            `<div style="padding:10px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selCli('${c.id}')">${c.name}</div>`
+            <div style="padding:10px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selCli('${c.id}')">${c.name}</div>
         ).join('');
     }
     function selCli(id) { 
@@ -747,7 +747,7 @@
     function renderStock() {
         const t = document.getElementById('stock-search').value.toLowerCase(); const tb = document.getElementById('table-stock'); 
         tb.innerHTML = inventory.filter(i=>(i.name||'').toLowerCase().includes(t)).map(i => 
-            `<tr><td>${i.name}</td><td>${i.size}</td><td>${i.price}</td><td>${i.qty}</td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td></tr>`
+            <tr><td>${i.name}</td><td>${i.size}</td><td>${i.price}</td><td>${i.qty}</td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td></tr>
         ).join('');
     }
     
@@ -792,7 +792,7 @@
     function renderCustomers(){ 
         const tb=document.getElementById('table-cli'); 
         tb.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(document.getElementById('search-cli').value.toLowerCase())).map(c => 
-            `<tr><td>${c.name}</td><td>${c.phone}</td></tr>`
+            <tr><td>${c.name}</td><td>${c.phone}</td></tr>
         ).join('');
     }
     
@@ -829,7 +829,7 @@
         
         salesHistory.forEach(s => {
             const shortMethod = shortenMethod(s.method);
-            t += `${s.date} | ${s.client} | ${shortMethod} | R$ ${s.total.toFixed(2)}\nItem: ${s.items}\n----------------\n`;
+            t += ${s.date} | ${s.client} | ${shortMethod} | R$ ${s.total.toFixed(2)}\nItem: ${s.items}\n----------------\n;
         });
 
         // O "\uFEFF" é a mágica que faz o Windows abrir com acentos certos
@@ -844,10 +844,10 @@
         selTop=null; selBot=null; openModal('modal-builder'); 
         const rt=document.getElementById('list-tops'); const rb=document.getElementById('list-bottoms'); 
         rt.innerHTML = inventory.filter(i=>i.type==='Sutiã'&&i.qty>0).map(i => 
-            `<div class="b-item" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`
+            <div class="b-item" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>
         ).join('');
         rb.innerHTML = inventory.filter(i=>i.type==='Calcinha'&&i.qty>0).map(i => 
-            `<div class="b-item" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`
+            <div class="b-item" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>
         ).join('');
     }
     function selPart(t,id,el){
