@@ -75,6 +75,7 @@
         .btn { padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; font-size: 1rem; }
         .btn-primary { background: var(--primary); } .btn-success { background: var(--success); }
         .btn-danger { background: var(--danger); } .btn-pink { background: var(--pink); }
+        .btn-info { background: var(--info); } .btn-dark { background: #34495e; }
         .btn:disabled { background: #b0bec5 !important; color: #fff !important; cursor: not-allowed; }
 
         /* FLUTUANTES */
@@ -82,7 +83,7 @@
         .cart-float:active { transform: scale(0.9); }
         .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 2px solid white; font-weight: bold; }
 
-        /* LOADING (BLUR + PULSE) */
+        /* LOADING */
         .loading-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255, 255, 255, 0.6); 
@@ -122,7 +123,7 @@
         .b-item:active { background: #e3f2fd; }
         .b-item.selected { background: #e3f2fd; border: 1px solid var(--primary); }
 
-        /* --- RESPONSIVIDADE (TRANSFORMA PC EM MOBILE) --- */
+        /* --- RESPONSIVIDADE (MOBILE) --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { display: none; }
@@ -149,22 +150,55 @@
             .cart-drawer { width: 100%; right: -100%; }
             .modal-box { width: 95%; padding: 20px; }
 
-            /* --- OTIMIZAÇÃO DA TABELA FINANCEIRA (LAYOUT MOBILE EM CARDS) --- */
-            #table-sales thead { display: none; } /* Esconde o cabeçalho chato */
-            #table-sales, #table-sales tbody, #table-sales tr, #table-sales td { display: block; width: 100%; }
-            #table-sales tr {
-                background: white; border: 1px solid #eee; border-radius: 10px; margin-bottom: 12px;
-                padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative;
+            /* --- CORREÇÃO DO LAYOUT FINANCEIRO (CARDS) --- */
+            /* Esconde cabeçalho da tabela */
+            #table-sales-container thead { display: none; }
+            
+            /* Transforma tabela em blocos */
+            #table-sales-container, #table-sales-container tbody, #table-sales-container tr, #table-sales-container td { 
+                display: block; width: 100%; box-sizing: border-box; 
             }
-            #table-sales td {
-                padding: 3px 0; border: none; text-align: left;
+            
+            #table-sales-container tr {
+                background: white; 
+                border: 1px solid #eee; 
+                border-radius: 12px; 
+                margin-bottom: 15px;
+                padding: 15px; 
+                box-shadow: 0 3px 10px rgba(0,0,0,0.03); 
+                position: relative;
             }
-            /* Visual dos campos no card mobile */
-            #table-sales td:nth-child(1) { font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; } /* Data */
-            #table-sales td:nth-child(2) { font-size: 1.1rem; font-weight: bold; color: var(--primary); margin-bottom: 5px; } /* Cliente */
-            #table-sales td:nth-child(3) { font-size: 0.9rem; color: #555; background: #f9f9f9; padding: 5px; border-radius: 5px; margin: 5px 0; } /* Itens */
-            #table-sales td:nth-child(4) { display: inline-block; font-size: 0.8rem; background: #e3f2fd; color: var(--info); padding: 2px 8px; border-radius: 10px; } /* Pag */
-            #table-sales td:nth-child(5) { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; font-weight: bold; color: var(--success); } /* Valor */
+
+            #table-sales-container td { padding: 0; border: none; text-align: left; }
+
+            /* 1. DATA (Topo Esquerda) */
+            #table-sales-container td:nth-child(1) {
+                font-size: 0.8rem; color: #999; font-weight: 600; margin-bottom: 2px;
+            }
+            
+            /* 2. VALOR (Topo Direita - Movido via CSS) */
+            #table-sales-container td:nth-child(5) {
+                position: absolute; top: 15px; right: 15px;
+                font-size: 1.3rem; font-weight: bold; color: var(--success);
+            }
+
+            /* 3. CLIENTE (Destaque) */
+            #table-sales-container td:nth-child(2) {
+                font-size: 1.1rem; font-weight: bold; color: var(--primary); margin-bottom: 10px;
+            }
+
+            /* 4. ITENS (Box cinza) */
+            #table-sales-container td:nth-child(3) {
+                background: #f5f5f5; color: #555; padding: 8px; border-radius: 6px; 
+                font-size: 0.9rem; margin-bottom: 8px; line-height: 1.4;
+            }
+
+            /* 5. PAGAMENTO (Badge) */
+            #table-sales-container td:nth-child(4) {
+                display: inline-block; font-size: 0.85rem; 
+                background: #e3f2fd; color: var(--info); 
+                padding: 4px 10px; border-radius: 15px; font-weight: 600;
+            }
         }
     </style>
 </head>
@@ -249,14 +283,19 @@
                     <div style="font-size:1.8rem; font-weight:bold; color:var(--text);"><span id="fin-count">0</span></div>
                 </div>
             </div>
+            
             <div class="form-card" style="margin:0; max-width:100%; padding: 15px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                    <h3>Últimas Vendas</h3>
-                    <button class="btn" style="background:#333; padding: 8px 15px;" onclick="exportReport()">📄 Relatório</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="margin:0;">Últimas Vendas</h3>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-info" style="padding: 8px 12px; font-size:0.9rem;" onclick="renderFinancials()">👁️ Ver Vendas</button>
+                        <button class="btn btn-dark" style="padding: 8px 12px; font-size:0.9rem;" onclick="exportReport()">🖨️ Imprimir</button>
+                    </div>
                 </div>
+                
                 <div style="max-height:500px; overflow-y:auto;">
                     <table id="table-sales-container">
-                        <thead id="fin-table-head">
+                        <thead>
                             <tr>
                                 <th>Data</th>
                                 <th>Cliente</th>
@@ -550,9 +589,6 @@
     function openCheckout(){ 
         if(!cart.length) return alert("Carrinho vazio!");
         
-        // AQUI ESTAVA O ERRO: Em vez de chamar closeAll() que fecha tudo com delay,
-        // vamos fechar SÓ O CARRINHO manualmente e abrir o modal direto.
-        
         document.getElementById('cart-drawer').classList.remove('open'); // Fecha gaveta
         document.getElementById('overlay').style.display='none'; // Fecha fundo da gaveta
         
@@ -760,19 +796,11 @@
         ).join('');
     }
     
-    // --- FUNÇÃO PARA ABREVIAR NOMES ---
-    function shortenMethod(m) {
-        if(!m) return '-';
-        if(m.includes('Crédito')) return 'Crédito';
-        if(m.includes('Débito')) return 'Débito';
-        if(m.includes('Dinheiro')) return 'Din';
-        return m;
-    }
-
     function renderFinancials(){
         const tot=salesHistory.reduce((a,b)=>a+b.total,0); document.getElementById('fin-total').innerText=tot.toFixed(2); document.getElementById('fin-count').innerText=salesHistory.length;
         const tb=document.getElementById('table-sales'); 
         
+        // Renderização Híbrida: Tabela PC / Cards Mobile (via CSS)
         tb.innerHTML = salesHistory.map(s => {
             const shortMethod = shortenMethod(s.method);
             return `<tr>
@@ -785,6 +813,16 @@
         }).join('');
     }
 
+    // --- FUNÇÃO PARA ABREVIAR NOMES ---
+    function shortenMethod(m) {
+        if(!m) return '-';
+        if(m.includes('Crédito')) return 'Crédito';
+        if(m.includes('Débito')) return 'Débito';
+        if(m.includes('Dinheiro')) return 'Din';
+        return m;
+    }
+
+    // --- CORREÇÃO DO TXT (ENCODING E NOME) ---
     function exportReport(){
         let t = "Relatorio Financeiro Litoral Brasil\n";
         t += "-----------------------------------\n";
@@ -819,5 +857,3 @@
     }
     function addComboToCart(){ if(selTop)addToCart(selTop.id); if(selBot)addToCart(selBot.id); closeAll(); }
 </script>
-</body>
-</html>
