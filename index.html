@@ -52,9 +52,9 @@
 
         /* CARDS E UI */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; will-change: transform; content-visibility: auto; /* Otimização de renderização */ }
+        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; will-change: transform; content-visibility: auto; }
         .product-card:active { transform: scale(0.98); }
-        .product-card img { width: 100%; height: 160px; object-fit: cover; background: #eee; loading: lazy; /* Lazy load nativo */ }
+        .product-card img { width: 100%; height: 160px; object-fit: cover; background: #eee; loading: lazy; }
         .info-box { padding: 12px; }
         .size-badge { position: absolute; top: 8px; right: 8px; background: var(--primary); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
@@ -64,7 +64,7 @@
         .btn-filter { background: white; border: 1px solid #ddd; color: #555; border-radius: 20px; padding: 8px 18px; cursor: pointer; white-space: nowrap; transition: 0.2s; font-size: 0.9rem; }
         .btn-filter.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* TABELAS */
+        /* TABELAS (DEFAULT PC) */
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-width: 600px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: #555; font-weight: 600; font-size: 0.85rem; }
@@ -75,7 +75,7 @@
         .btn { padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; font-size: 1rem; }
         .btn-primary { background: var(--primary); } .btn-success { background: var(--success); }
         .btn-danger { background: var(--danger); } .btn-pink { background: var(--pink); }
-        .btn:disabled { background: #b0bec5 !important; color: #fff !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+        .btn:disabled { background: #b0bec5 !important; color: #fff !important; cursor: not-allowed; }
 
         /* FLUTUANTES */
         .cart-float { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 900; cursor: pointer; border: 3px solid white; transition: transform 0.2s; }
@@ -95,16 +95,17 @@
             display: flex; align-items: center; justify-content: center;
             color: white; font-size: 1.5rem; box-shadow: 0 0 20px rgba(0,86,145, 0.4);
         }
-        @keyframes pulse {
-            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 86, 145, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(0, 86, 145, 0); }
-            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 86, 145, 0); }
-        }
+        @keyframes pulse { 0% { transform: scale(0.9); } 70% { transform: scale(1); } 100% { transform: scale(0.9); } }
+
+        /* LOADER DADOS */
+        .data-loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; text-align: center; }
+        .data-spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        .data-text { color: var(--primary); font-weight: 600; font-size: 1.1rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* MODAIS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .overlay.visible { opacity: 1; }
-        
         .modal-box { background: white; width: 500px; max-width: 90%; padding: 25px; border-radius: 12px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s; }
         .overlay.visible .modal-box { transform: scale(1); }
 
@@ -121,7 +122,7 @@
         .b-item:active { background: #e3f2fd; }
         .b-item.selected { background: #e3f2fd; border: 1px solid var(--primary); }
 
-        /* --- RESPONSIVIDADE --- */
+        /* --- RESPONSIVIDADE (TRANSFORMA PC EM MOBILE) --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { display: none; }
@@ -147,6 +148,23 @@
             .cart-float { bottom: 80px; right: 20px; }
             .cart-drawer { width: 100%; right: -100%; }
             .modal-box { width: 95%; padding: 20px; }
+
+            /* --- OTIMIZAÇÃO DA TABELA FINANCEIRA (LAYOUT MOBILE EM CARDS) --- */
+            #table-sales thead { display: none; } /* Esconde o cabeçalho chato */
+            #table-sales, #table-sales tbody, #table-sales tr, #table-sales td { display: block; width: 100%; }
+            #table-sales tr {
+                background: white; border: 1px solid #eee; border-radius: 10px; margin-bottom: 12px;
+                padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative;
+            }
+            #table-sales td {
+                padding: 3px 0; border: none; text-align: left;
+            }
+            /* Visual dos campos no card mobile */
+            #table-sales td:nth-child(1) { font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; } /* Data */
+            #table-sales td:nth-child(2) { font-size: 1.1rem; font-weight: bold; color: var(--primary); margin-bottom: 5px; } /* Cliente */
+            #table-sales td:nth-child(3) { font-size: 0.9rem; color: #555; background: #f9f9f9; padding: 5px; border-radius: 5px; margin: 5px 0; } /* Itens */
+            #table-sales td:nth-child(4) { display: inline-block; font-size: 0.8rem; background: #e3f2fd; color: var(--info); padding: 2px 8px; border-radius: 10px; } /* Pag */
+            #table-sales td:nth-child(5) { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; font-weight: bold; color: var(--success); } /* Valor */
         }
     </style>
 </head>
@@ -183,11 +201,18 @@
                 <button class="btn-filter" onclick="filterPDV('Fit-Macacão', this)">Macacão</button>
                 <button class="btn-filter" onclick="filterPDV('Fit-Macaquinho', this)">Macaquinho</button>
             </div>
+            
             <div style="display:flex; gap:15px; margin-bottom:20px;">
                 <input type="text" id="pdv-search" placeholder="🔍 Buscar..." onkeyup="renderPDV()" style="margin:0; border-radius:30px; border:none; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
                 <button class="btn btn-pink" onclick="openBuilder()" style="border-radius:30px; white-space:nowrap; padding: 0 25px;">👙 Montar</button>
             </div>
-            <div id="pdv-grid" class="product-grid"></div>
+
+            <div id="pdv-loader" class="data-loader-container">
+                <div class="data-spinner"></div>
+                <div class="data-text">Carregando...<br>Estou trazendo todas as peças.</div>
+            </div>
+
+            <div id="pdv-grid" class="product-grid" style="display:none;"></div>
         </section>
 
         <section id="clientes" class="view-section">
@@ -224,14 +249,14 @@
                     <div style="font-size:1.8rem; font-weight:bold; color:var(--text);"><span id="fin-count">0</span></div>
                 </div>
             </div>
-            <div class="form-card" style="margin:0; max-width:100%;">
+            <div class="form-card" style="margin:0; max-width:100%; padding: 15px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
                     <h3>Últimas Vendas</h3>
                     <button class="btn" style="background:#333; padding: 8px 15px;" onclick="exportReport()">📄 Relatório</button>
                 </div>
-                <div style="max-height:400px; overflow-y:auto;">
-                    <table>
-                        <thead>
+                <div style="max-height:500px; overflow-y:auto;">
+                    <table id="table-sales-container">
+                        <thead id="fin-table-head">
                             <tr>
                                 <th>Data</th>
                                 <th>Cliente</th>
@@ -332,12 +357,17 @@
     <h2 style="margin-top:0;">Pagamento</h2>
     <h1 style="text-align:center; color:var(--primary); font-size:2.5rem;">R$ <span id="chk-total">0.00</span></h1>
     <label>Forma de Pagamento</label>
-    <select id="chk-method"><option>Pix</option><option>Cartão Crédito</option><option>Cartão Débito</option><option>Dinheiro</option></select>
+    <select id="chk-method">
+        <option value="Pix">Pix</option>
+        <option value="Crédito">Cartão de Crédito</option>
+        <option value="Débito">Cartão de Débito</option>
+        <option value="Dinheiro">Dinheiro</option>
+    </select>
     <label>Vincular Cliente</label>
     <input type="text" id="chk-search-cli" placeholder="Digite nome..." onkeyup="searchCheckoutClient()">
     <div id="chk-results" style="border:1px solid #eee; max-height:100px; overflow-y:auto; display:none;"></div>
     <div id="chk-selected-cli" style="background:#e8f5e9; color:#2e7d32; padding:10px; border-radius:6px; margin-bottom:15px; display:none; font-weight:bold;"></div>
-    <button class="btn btn-success" style="width:100%;" onclick="finishSale()">CONFIRMAR VENDA</button>
+    <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="finishSale()">CONFIRMAR VENDA</button>
 </div>
 
 <div id="modal-builder" class="modal-box" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1300; display:none;">
@@ -405,28 +435,22 @@
       measurementId: "G-W3L44XPTHY"
     };
 
-    // 1. INICIALIZAÇÃO + PERSISTÊNCIA (CACHE)
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     
-    // Tenta ativar o cache offline para acelerar
-    db.enablePersistence().catch(err => {
-        if (err.code == 'failed-precondition') {
-            console.log('Múltiplas abas abertas, persistência desativada.');
-        } else if (err.code == 'unimplemented') {
-            console.log('Navegador não suporta persistência.');
-        }
-    });
+    // Cache
+    db.enablePersistence().catch(err => { console.log(err.code); });
 
     let inventory=[], customers=[], salesHistory=[], cart=[];
     let selTop=null, selBot=null, selectedClient=null, tempImg=null, editImg=null;
     const NO_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E";
 
     window.onload = function() {
-        // Listeners otimizados
         db.collection("inventory").onSnapshot(s=>{ 
             inventory=[]; 
             s.forEach(d=>inventory.push({...d.data(),id:d.id})); 
+            document.getElementById('pdv-loader').style.display = 'none';
+            document.getElementById('pdv-grid').style.display = 'grid';
             renderPDV(); 
             renderStock(); 
         });
@@ -442,11 +466,10 @@
         });
     };
 
-    // --- HELPER DE LOADING & BLOQUEIO ---
+    // --- HELPER DE LOADING ---
     function setLoading(isLoading, btnId) {
         const overlay = document.getElementById('loading-overlay');
         overlay.style.display = isLoading ? 'flex' : 'none';
-        
         if(btnId) {
             const btn = document.getElementById(btnId);
             if(btn) {
@@ -496,14 +519,12 @@
         renderCart();
     }
 
-    // --- LÓGICA PDV (OTIMIZADA: GERA HTML EM LOTE) ---
+    // --- LÓGICA PDV ---
     let pdvFilter = 'todos';
     function filterPDV(t,b){ pdvFilter=t; document.querySelectorAll('.btn-filter').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderPDV(); }
     
     function renderPDV() {
         const g = document.getElementById('pdv-grid'); const t = document.getElementById('pdv-search').value.toLowerCase(); 
-        
-        // 2. RENDERIZAÇÃO EM LOTE (BATCH)
         const html = inventory.filter(i=>{
             const n = i.name ? i.name.toLowerCase() : '';
             return (pdvFilter==='todos'||i.type===pdvFilter) && n.includes(t);
@@ -513,9 +534,8 @@
                 <div class="size-badge">${i.size}</div><img src="${i.img||NO_IMG}" loading="lazy">
                 <div class="info-box"><b>${i.name}</b><br><small>${i.type}</small><br><span style="color:var(--primary);font-weight:bold;">R$ ${i.price}</span></div>
             </div>`;
-        }).join(''); // Junta tudo numa string só
-        
-        g.innerHTML = html; // Escreve no DOM apenas 1 vez
+        }).join('');
+        g.innerHTML = html;
     }
 
     function addToCart(id) {
@@ -528,7 +548,6 @@
     function renderCart() {
         const d = document.getElementById('cart-list'); 
         let tot=0;
-        
         d.innerHTML = cart.map((c,ix) => {
             tot += c.price*c.q;
             return `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #eee; padding:10px 0;">
@@ -536,7 +555,6 @@
                 <button onclick="cart.splice(${ix},1);renderCart()" style="color:red;border:none;background:none;cursor:pointer;">🗑️</button>
             </div>`;
         }).join('');
-        
         document.getElementById('cart-total').innerText = document.getElementById('chk-total').innerText = tot.toFixed(2);
     }
     function clearCart(){ cart=[]; renderCart(); document.getElementById('cart-count').innerText='0'; closeAll(); }
@@ -545,25 +563,42 @@
     
     function searchCheckoutClient() {
         const t = document.getElementById('chk-search-cli').value.toLowerCase(); 
-        const r = document.getElementById('chk-results'); 
-        r.style.display='block';
-        
+        const r = document.getElementById('chk-results'); r.style.display='block';
         r.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(t)).map(c => 
             `<div style="padding:10px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selCli('${c.id}')">${c.name}</div>`
         ).join('');
     }
     function selCli(id) { selectedClient=customers.find(c=>c.id===id); document.getElementById('chk-selected-cli').innerText='Cliente: '+selectedClient.name; document.getElementById('chk-selected-cli').style.display='block'; document.getElementById('chk-results').style.display='none'; }
 
+    // --- CORREÇÃO DO BUG DE FECHAR SOZINHO ---
     function finishSale() {
+        if(cart.length === 0) return alert("Carrinho vazio!");
+        
         setLoading(true);
         const b = db.batch();
         cart.forEach(c=>{ b.update(db.collection('inventory').doc(c.id), {qty: c.qty-c.q}); });
+        
         const tot = parseFloat(document.getElementById('chk-total').innerText);
+        const method = document.getElementById('chk-method').value; // Pega valor exato
+        
         b.set(db.collection('sales').doc(), {
-            date: new Date().toLocaleString(), client: selectedClient?selectedClient.name:'Avulso', total: tot,
-            method: document.getElementById('chk-method').value, items: cart.map(x=>x.name).join(', '), timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            date: new Date().toLocaleString(), 
+            client: selectedClient?selectedClient.name:'Avulso', 
+            total: tot,
+            method: method, 
+            items: cart.map(x=>x.name).join(', '), 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        b.commit().then(()=>{ setLoading(false); alert('Venda Realizada!'); clearCart(); closeAll(); }).catch(err=>{setLoading(false); alert('Erro ao vender');});
+        
+        b.commit().then(()=>{ 
+            setLoading(false); 
+            alert('Venda Realizada!'); 
+            clearCart(); 
+            closeAll(); // Só fecha DEPOIS de dar certo
+        }).catch(err=>{
+            setLoading(false); 
+            alert('Erro ao vender: ' + err);
+        });
     }
 
     // --- CRUD ---
@@ -583,7 +618,6 @@
     function saveProduct(e) {
         e.preventDefault();
         setLoading(true, 'btn-save-new');
-        
         db.collection('inventory').add({
             name: document.getElementById('cad-name').value, type: document.getElementById('cad-type').value,
             size: document.getElementById('cad-size').value, price: parseFloat(document.getElementById('cad-price').value),
@@ -598,7 +632,6 @@
     
     function renderStock() {
         const t = document.getElementById('stock-search').value.toLowerCase(); const tb = document.getElementById('table-stock'); 
-        
         tb.innerHTML = inventory.filter(i=>(i.name||'').toLowerCase().includes(t)).map(i => 
             `<tr><td>${i.name}</td><td>${i.size}</td><td>${i.price}</td><td>${i.qty}</td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td></tr>`
         ).join('');
@@ -627,7 +660,6 @@
             size:document.getElementById('edit-size').value
         };
         if(editImg) u.img=editImg; 
-        
         db.collection('inventory').doc(id).update(u)
         .then(()=>{ closeAll(); alert('Atualizado!'); })
         .catch(err => alert('Erro: ' + err))
@@ -653,29 +685,52 @@
         const tot=salesHistory.reduce((a,b)=>a+b.total,0); document.getElementById('fin-total').innerText=tot.toFixed(2); document.getElementById('fin-count').innerText=salesHistory.length;
         const tb=document.getElementById('table-sales'); 
         
-        // --- TABELA FINANCEIRA (COM COLUNAS ADICIONAIS) ---
-        tb.innerHTML = salesHistory.map(s => `<tr>
+        // Renderização Híbrida: Tabela PC / Cards Mobile (via CSS)
+        tb.innerHTML = salesHistory.map(s => {
+            const shortMethod = shortenMethod(s.method);
+            return `<tr>
                 <td>${s.date.split(' ')[0]}</td>
                 <td>${s.client}</td>
                 <td style="font-size:0.8rem; color:#555;">${s.items}</td>
-                <td>${s.method}</td>
-                <td style="font-weight:bold; color:var(--success);">R$ ${s.total}</td>
-            </tr>`
-        ).join('');
+                <td>${shortMethod}</td>
+                <td style="font-weight:bold; color:var(--success);">R$ ${s.total.toFixed(2)}</td>
+            </tr>`;
+        }).join('');
     }
+
+    // --- FUNÇÃO PARA ABREVIAR NOMES ---
+    function shortenMethod(m) {
+        if(!m) return '-';
+        if(m.includes('Crédito')) return 'Crédito';
+        if(m.includes('Débito')) return 'Débito';
+        if(m.includes('Dinheiro')) return 'Din';
+        return m;
+    }
+
+    // --- CORREÇÃO DO TXT (ENCODING E NOME) ---
     function exportReport(){
-        let t="RELATORIO VENDAS\n\n"; salesHistory.forEach(s=>t+=`${s.date} - ${s.client} - (${s.items}) - ${s.method} - R$ ${s.total}\n`);
-        const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'})); a.download='vendas.txt'; a.click();
+        let t = "Relatorio Financeiro Litoral Brasil\n";
+        t += "-----------------------------------\n";
+        
+        salesHistory.forEach(s => {
+            const shortMethod = shortenMethod(s.method);
+            t += `${s.date} | ${s.client} | ${shortMethod} | R$ ${s.total.toFixed(2)}\nItem: ${s.items}\n----------------\n`;
+        });
+
+        // O "\uFEFF" é a mágica que faz o Windows abrir com acentos certos
+        const blob = new Blob(["\uFEFF"+t], {type: 'text/plain;charset=utf-8'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'Relatorio_Litoral_Brasil.txt';
+        a.click();
     }
 
     function openBuilder(){ 
         selTop=null; selBot=null; openModal('modal-builder'); 
         const rt=document.getElementById('list-tops'); const rb=document.getElementById('list-bottoms'); 
-        
         rt.innerHTML = inventory.filter(i=>i.type==='Sutiã'&&i.qty>0).map(i => 
             `<div class="b-item" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`
         ).join('');
-        
         rb.innerHTML = inventory.filter(i=>i.type==='Calcinha'&&i.qty>0).map(i => 
             `<div class="b-item" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`
         ).join('');
