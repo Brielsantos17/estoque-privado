@@ -52,9 +52,9 @@
 
         /* CARDS E UI */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; will-change: transform; }
+        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; will-change: transform; content-visibility: auto; /* Otimização de renderização */ }
         .product-card:active { transform: scale(0.98); }
-        .product-card img { width: 100%; height: 160px; object-fit: cover; background: #eee; }
+        .product-card img { width: 100%; height: 160px; object-fit: cover; background: #eee; loading: lazy; /* Lazy load nativo */ }
         .info-box { padding: 12px; }
         .size-badge { position: absolute; top: 8px; right: 8px; background: var(--primary); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
@@ -65,7 +65,7 @@
         .btn-filter.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* TABELAS */
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-width: 600px; /* Garante scroll horizontal */ }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-width: 600px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: #555; font-weight: 600; font-size: 0.85rem; }
         
@@ -75,8 +75,6 @@
         .btn { padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; font-size: 1rem; }
         .btn-primary { background: var(--primary); } .btn-success { background: var(--success); }
         .btn-danger { background: var(--danger); } .btn-pink { background: var(--pink); }
-        
-        /* ESTADO DESABILITADO (TRAVADO) */
         .btn:disabled { background: #b0bec5 !important; color: #fff !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
         /* FLUTUANTES */
@@ -84,7 +82,7 @@
         .cart-float:active { transform: scale(0.9); }
         .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 2px solid white; font-weight: bold; }
 
-        /* --- NOVO LOADING MOBILE (BLUR + PULSE) --- */
+        /* LOADING (BLUR + PULSE) */
         .loading-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255, 255, 255, 0.6); 
@@ -407,17 +405,41 @@
       measurementId: "G-W3L44XPTHY"
     };
 
+    // 1. INICIALIZAÇÃO + PERSISTÊNCIA (CACHE)
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    
+    // Tenta ativar o cache offline para acelerar
+    db.enablePersistence().catch(err => {
+        if (err.code == 'failed-precondition') {
+            console.log('Múltiplas abas abertas, persistência desativada.');
+        } else if (err.code == 'unimplemented') {
+            console.log('Navegador não suporta persistência.');
+        }
+    });
 
     let inventory=[], customers=[], salesHistory=[], cart=[];
     let selTop=null, selBot=null, selectedClient=null, tempImg=null, editImg=null;
     const NO_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E";
 
     window.onload = function() {
-        db.collection("inventory").onSnapshot(s=>{ inventory=[]; s.forEach(d=>inventory.push({...d.data(),id:d.id})); renderPDV(); renderStock(); });
-        db.collection("customers").onSnapshot(s=>{ customers=[]; s.forEach(d=>customers.push({...d.data(),id:d.id})); renderCustomers(); });
-        db.collection("sales").orderBy("timestamp","desc").limit(50).onSnapshot(s=>{ salesHistory=[]; s.forEach(d=>salesHistory.push({...d.data(),id:d.id})); renderFinancials(); });
+        // Listeners otimizados
+        db.collection("inventory").onSnapshot(s=>{ 
+            inventory=[]; 
+            s.forEach(d=>inventory.push({...d.data(),id:d.id})); 
+            renderPDV(); 
+            renderStock(); 
+        });
+        db.collection("customers").onSnapshot(s=>{ 
+            customers=[]; 
+            s.forEach(d=>customers.push({...d.data(),id:d.id})); 
+            renderCustomers(); 
+        });
+        db.collection("sales").orderBy("timestamp","desc").limit(50).onSnapshot(s=>{ 
+            salesHistory=[]; 
+            s.forEach(d=>salesHistory.push({...d.data(),id:d.id})); 
+            renderFinancials(); 
+        });
     };
 
     // --- HELPER DE LOADING & BLOQUEIO ---
@@ -474,22 +496,26 @@
         renderCart();
     }
 
-    // --- LÓGICA PDV ---
+    // --- LÓGICA PDV (OTIMIZADA: GERA HTML EM LOTE) ---
     let pdvFilter = 'todos';
     function filterPDV(t,b){ pdvFilter=t; document.querySelectorAll('.btn-filter').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderPDV(); }
     
     function renderPDV() {
-        const g = document.getElementById('pdv-grid'); const t = document.getElementById('pdv-search').value.toLowerCase(); g.innerHTML='';
-        inventory.filter(i=>{
+        const g = document.getElementById('pdv-grid'); const t = document.getElementById('pdv-search').value.toLowerCase(); 
+        
+        // 2. RENDERIZAÇÃO EM LOTE (BATCH)
+        const html = inventory.filter(i=>{
             const n = i.name ? i.name.toLowerCase() : '';
             return (pdvFilter==='todos'||i.type===pdvFilter) && n.includes(t);
-        }).forEach(i=>{
+        }).map(i => {
             const op = i.qty<1 ? 0.5 : 1;
-            g.innerHTML += `<div class="product-card" style="opacity:${op}" onclick="addToCart('${i.id}')">
-                <div class="size-badge">${i.size}</div><img src="${i.img||NO_IMG}">
+            return `<div class="product-card" style="opacity:${op}" onclick="addToCart('${i.id}')">
+                <div class="size-badge">${i.size}</div><img src="${i.img||NO_IMG}" loading="lazy">
                 <div class="info-box"><b>${i.name}</b><br><small>${i.type}</small><br><span style="color:var(--primary);font-weight:bold;">R$ ${i.price}</span></div>
             </div>`;
-        });
+        }).join(''); // Junta tudo numa string só
+        
+        g.innerHTML = html; // Escreve no DOM apenas 1 vez
     }
 
     function addToCart(id) {
@@ -500,14 +526,17 @@
     }
     
     function renderCart() {
-        const d = document.getElementById('cart-list'); d.innerHTML=''; let tot=0;
-        cart.forEach((c,ix)=>{
-            tot+=c.price*c.q;
-            d.innerHTML+=`<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #eee; padding:10px 0;">
+        const d = document.getElementById('cart-list'); 
+        let tot=0;
+        
+        d.innerHTML = cart.map((c,ix) => {
+            tot += c.price*c.q;
+            return `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #eee; padding:10px 0;">
                 <div><b>${c.name}</b> (${c.size})<br>${c.q}x R$ ${c.price}</div>
                 <button onclick="cart.splice(${ix},1);renderCart()" style="color:red;border:none;background:none;cursor:pointer;">🗑️</button>
             </div>`;
-        });
+        }).join('');
+        
         document.getElementById('cart-total').innerText = document.getElementById('chk-total').innerText = tot.toFixed(2);
     }
     function clearCart(){ cart=[]; renderCart(); document.getElementById('cart-count').innerText='0'; closeAll(); }
@@ -515,10 +544,13 @@
     function openCheckout(){ if(!cart.length)return; closeAll(); openModal('modal-checkout'); }
     
     function searchCheckoutClient() {
-        const t = document.getElementById('chk-search-cli').value.toLowerCase(); const r = document.getElementById('chk-results'); r.innerHTML=''; r.style.display='block';
-        customers.filter(c=>(c.name||'').toLowerCase().includes(t)).forEach(c=>{
-            r.innerHTML+=`<div style="padding:10px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selCli('${c.id}')">${c.name}</div>`;
-        });
+        const t = document.getElementById('chk-search-cli').value.toLowerCase(); 
+        const r = document.getElementById('chk-results'); 
+        r.style.display='block';
+        
+        r.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(t)).map(c => 
+            `<div style="padding:10px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selCli('${c.id}')">${c.name}</div>`
+        ).join('');
     }
     function selCli(id) { selectedClient=customers.find(c=>c.id===id); document.getElementById('chk-selected-cli').innerText='Cliente: '+selectedClient.name; document.getElementById('chk-selected-cli').style.display='block'; document.getElementById('chk-results').style.display='none'; }
 
@@ -541,7 +573,6 @@
                 const i=new Image(); i.onload=()=>{
                     const c=document.createElement('canvas'); const x=c.getContext('2d'); c.width=200; c.height=(i.height*200)/i.width; x.drawImage(i,0,0,c.width,c.height);
                     const d=c.toDataURL('image/jpeg',0.6);
-                    
                     if(m==='new'){ tempImg=d; document.getElementById('cad-preview').src=d; document.getElementById('cad-preview').style.display='block'; }
                     else { editImg=d; document.getElementById('edit-preview').src=d; }
                 }; i.src=e.target.result;
@@ -566,10 +597,11 @@
     }
     
     function renderStock() {
-        const t = document.getElementById('stock-search').value.toLowerCase(); const tb = document.getElementById('table-stock'); tb.innerHTML='';
-        inventory.filter(i=>(i.name||'').toLowerCase().includes(t)).forEach(i=>{
-            tb.innerHTML+=`<tr><td>${i.name}</td><td>${i.size}</td><td>${i.price}</td><td>${i.qty}</td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td></tr>`;
-        });
+        const t = document.getElementById('stock-search').value.toLowerCase(); const tb = document.getElementById('table-stock'); 
+        
+        tb.innerHTML = inventory.filter(i=>(i.name||'').toLowerCase().includes(t)).map(i => 
+            `<tr><td>${i.name}</td><td>${i.size}</td><td>${i.price}</td><td>${i.qty}</td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td></tr>`
+        ).join('');
     }
     
     function openEdit(id) {
@@ -610,21 +642,26 @@
     }
 
     function saveCustomer(e){ e.preventDefault(); db.collection('customers').add({name:document.getElementById('cli-name').value, phone:document.getElementById('cli-phone').value}).then(()=>{ closeAll(); alert('Cliente Salvo'); }); }
-    function renderCustomers(){ const tb=document.getElementById('table-cli'); tb.innerHTML=''; customers.filter(c=>(c.name||'').toLowerCase().includes(document.getElementById('search-cli').value.toLowerCase())).forEach(c=>{ tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.phone}</td></tr>`; }); }
+    function renderCustomers(){ 
+        const tb=document.getElementById('table-cli'); 
+        tb.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(document.getElementById('search-cli').value.toLowerCase())).map(c => 
+            `<tr><td>${c.name}</td><td>${c.phone}</td></tr>`
+        ).join('');
+    }
     
     function renderFinancials(){
         const tot=salesHistory.reduce((a,b)=>a+b.total,0); document.getElementById('fin-total').innerText=tot.toFixed(2); document.getElementById('fin-count').innerText=salesHistory.length;
-        const tb=document.getElementById('table-sales'); tb.innerHTML='';
-        // --- AQUI ESTÁ A CORREÇÃO: ADICIONEI ITEMS E METHOD ---
-        salesHistory.forEach(s=>{ 
-            tb.innerHTML+=`<tr>
+        const tb=document.getElementById('table-sales'); 
+        
+        // --- TABELA FINANCEIRA (COM COLUNAS ADICIONAIS) ---
+        tb.innerHTML = salesHistory.map(s => `<tr>
                 <td>${s.date.split(' ')[0]}</td>
                 <td>${s.client}</td>
                 <td style="font-size:0.8rem; color:#555;">${s.items}</td>
                 <td>${s.method}</td>
                 <td style="font-weight:bold; color:var(--success);">R$ ${s.total}</td>
-            </tr>`; 
-        });
+            </tr>`
+        ).join('');
     }
     function exportReport(){
         let t="RELATORIO VENDAS\n\n"; salesHistory.forEach(s=>t+=`${s.date} - ${s.client} - (${s.items}) - ${s.method} - R$ ${s.total}\n`);
@@ -633,9 +670,15 @@
 
     function openBuilder(){ 
         selTop=null; selBot=null; openModal('modal-builder'); 
-        const rt=document.getElementById('list-tops'); const rb=document.getElementById('list-bottoms'); rt.innerHTML=''; rb.innerHTML='';
-        inventory.filter(i=>i.type==='Sutiã'&&i.qty>0).forEach(i=>rt.innerHTML+=`<div class="b-item" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`);
-        inventory.filter(i=>i.type==='Calcinha'&&i.qty>0).forEach(i=>rb.innerHTML+=`<div class="b-item" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`);
+        const rt=document.getElementById('list-tops'); const rb=document.getElementById('list-bottoms'); 
+        
+        rt.innerHTML = inventory.filter(i=>i.type==='Sutiã'&&i.qty>0).map(i => 
+            `<div class="b-item" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`
+        ).join('');
+        
+        rb.innerHTML = inventory.filter(i=>i.type==='Calcinha'&&i.qty>0).map(i => 
+            `<div class="b-item" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`
+        ).join('');
     }
     function selPart(t,id,el){
         const i=inventory.find(x=>x.id===id); if(t==='top')selTop=i; else selBot=i;
