@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Litoral Brasil</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #005691; --primary-dark: #004472; --gold: #fbc02d;
@@ -83,7 +84,7 @@
         .cart-float:active { transform: scale(0.9); }
         .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 2px solid white; font-weight: bold; }
 
-        /* LOADING (BLUR + PULSE) */
+        /* LOADING */
         .loading-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255, 255, 255, 0.6); 
@@ -123,6 +124,11 @@
         .b-item:active { background: #e3f2fd; }
         .b-item.selected { background: #e3f2fd; border: 1px solid var(--primary); }
 
+        /* ESTILOS DE VISIBILIDADE PADRÃO (DESKTOP) */
+        #sales-list-wrapper { display: block; } 
+        #btn-view-sales { display: none; } 
+        .chart-container { display: block; } /* Grafico visivel no PC */
+
         /* --- RESPONSIVIDADE (MOBILE OTIMIZADO) --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
@@ -150,61 +156,30 @@
             .cart-drawer { width: 100%; right: -100%; }
             .modal-box { width: 95%; padding: 20px; }
 
-            /* --- OTIMIZAÇÃO DA TABELA FINANCEIRA (LAYOUT DE CARDS) --- */
-            /* Esconde cabeçalho da tabela */
+            /* Ocultar grafico no mobile */
+            .chart-container { display: none !important; }
+
+            /* --- MUDANÇAS ESPECÍFICAS PARA O FINANCEIRO MOBILE --- */
+            #sales-list-wrapper { display: none; margin-top: 15px; } /* Esconde lista no mobile */
+            #btn-view-sales { display: inline-block; } /* Mostra botão ver vendas */
+
+            /* Layout de Cards no Financeiro */
             #table-sales-container { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
             #table-sales-container thead { display: none; }
-            
-            /* Transforma linhas em Cards */
-            #table-sales-container tbody, #table-sales-container tr, #table-sales-container td { 
-                display: block; width: 100%; box-sizing: border-box; 
-            }
+            #table-sales-container tbody, #table-sales-container tr, #table-sales-container td { display: block; width: 100%; box-sizing: border-box; }
             
             #table-sales-container tr {
-                background: white; 
-                border: 1px solid #e0e0e0; 
-                border-radius: 12px; 
-                margin-bottom: 15px;
-                padding: 15px; 
-                box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
-                position: relative;
+                background: white; border: 1px solid #e0e0e0; border-radius: 12px; 
+                margin-bottom: 15px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;
             }
-
             #table-sales-container td { padding: 0; border: none; text-align: left; }
 
-            /* 1. DATA (Topo Esquerda) */
-            #table-sales-container td:nth-child(1) {
-                font-size: 0.75rem; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;
-            }
-            
-            /* 2. VALOR (Topo Direita - Movido via CSS Absolute) */
-            #table-sales-container td:nth-child(5) {
-                position: absolute; top: 15px; right: 15px;
-                font-size: 1.4rem; font-weight: 900; color: var(--success);
-            }
-
-            /* 3. CLIENTE (Destaque, com margem para não bater no valor) */
-            #table-sales-container td:nth-child(2) {
-                font-size: 1.1rem; font-weight: 800; color: var(--text); 
-                margin-bottom: 10px; padding-right: 90px; /* Espaço pro valor */
-                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            }
-
-            /* 4. ITENS (Box cinza claro) */
-            #table-sales-container td:nth-child(3) {
-                background: #f8f9fa; color: #555; padding: 10px; border-radius: 8px; 
-                font-size: 0.9rem; margin-bottom: 10px; line-height: 1.4; border-left: 3px solid #ddd;
-            }
-            #table-sales-container td:nth-child(3)::before {
-                content: '🛒 ';
-            }
-
-            /* 5. PAGAMENTO (Badge) */
-            #table-sales-container td:nth-child(4) {
-                display: inline-block; font-size: 0.8rem; 
-                background: #e3f2fd; color: #1565c0; 
-                padding: 4px 12px; border-radius: 20px; font-weight: 700;
-            }
+            #table-sales-container td:nth-child(1) { font-size: 0.75rem; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+            #table-sales-container td:nth-child(5) { position: absolute; top: 15px; right: 15px; font-size: 1.4rem; font-weight: 900; color: var(--success); }
+            #table-sales-container td:nth-child(2) { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 10px; padding-right: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            #table-sales-container td:nth-child(3) { background: #f8f9fa; color: #555; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 10px; line-height: 1.4; border-left: 3px solid #ddd; }
+            #table-sales-container td:nth-child(3)::before { content: '🛒 '; }
+            #table-sales-container td:nth-child(4) { display: inline-block; font-size: 0.8rem; background: #e3f2fd; color: #1565c0; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
         }
     </style>
 </head>
@@ -279,6 +254,11 @@
 
         <section id="financeiro" class="view-section">
             <h2>Financeiro</h2>
+            
+            <div class="chart-container" style="background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); height: 350px; position: relative;">
+                <canvas id="salesChart"></canvas>
+            </div>
+
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:30px;">
                 <div style="background:white; padding:20px; border-radius:12px; border-left:5px solid var(--success); box-shadow:0 4px 15px rgba(0,0,0,0.05);">
                     <small style="color:#888; font-weight:600; text-transform:uppercase;">Faturamento</small>
@@ -294,12 +274,12 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="margin:0;">Últimas Vendas</h3>
                     <div style="display:flex; gap:10px;">
-                        <button class="btn btn-info" style="padding: 10px 15px; font-size:0.9rem; flex:1;" onclick="renderFinancials()">👁️ Ver Vendas</button>
+                        <button id="btn-view-sales" class="btn btn-info" style="padding: 10px 15px; font-size:0.9rem; flex:1;" onclick="toggleMobileSales()">👁️ Ver Vendas</button>
                         <button class="btn btn-dark" style="padding: 10px 15px; font-size:0.9rem; flex:1;" onclick="exportReport()">🖨️ Imprimir</button>
                     </div>
                 </div>
                 
-                <div style="max-height:500px; overflow-y:auto;">
+                <div id="sales-list-wrapper" style="max-height:500px; overflow-y:auto;">
                     <table id="table-sales-container">
                         <thead>
                             <tr>
@@ -488,8 +468,8 @@
 
     let inventory=[], customers=[], salesHistory=[], cart=[];
     let selTop=null, selBot=null, selectedClient=null, tempImg=null, editImg=null;
-    // Variável para controlar o timeout do modal e evitar o bug de fechar sozinho
     let modalTimer = null; 
+    let myChart = null; // Para o gráfico
     
     const NO_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E";
 
@@ -632,6 +612,9 @@
         const btn = document.querySelector('.cart-float');
         btn.style.transform = "scale(1.2)";
         setTimeout(()=>btn.style.transform = "scale(1)", 200);
+        
+        // AQUI: ABRE O CARRINHO DIRETO
+        toggleCartDrawer();
     }
     
     function renderCart() {
@@ -802,11 +785,19 @@
         ).join('');
     }
     
+    // --- FUNÇÃO PARA ABREVIAR NOMES ---
+    function shortenMethod(m) {
+        if(!m) return '-';
+        if(m.includes('Crédito')) return 'Crédito';
+        if(m.includes('Débito')) return 'Débito';
+        if(m.includes('Dinheiro')) return 'Din';
+        return m;
+    }
+
     function renderFinancials(){
         const tot=salesHistory.reduce((a,b)=>a+b.total,0); document.getElementById('fin-total').innerText=tot.toFixed(2); document.getElementById('fin-count').innerText=salesHistory.length;
         const tb=document.getElementById('table-sales'); 
         
-        // Renderização Híbrida: Tabela PC / Cards Mobile (via CSS)
         tb.innerHTML = salesHistory.map(s => {
             const shortMethod = shortenMethod(s.method);
             return `<tr>
@@ -817,15 +808,60 @@
                 <td style="font-weight:bold; color:var(--success);">R$ ${s.total.toFixed(2)}</td>
             </tr>`;
         }).join('');
+
+        // ATUALIZA GRÁFICO (SOMENTE DESKTOP)
+        updateChart();
     }
 
-    // --- FUNÇÃO PARA ABREVIAR NOMES ---
-    function shortenMethod(m) {
-        if(!m) return '-';
-        if(m.includes('Crédito')) return 'Crédito';
-        if(m.includes('Débito')) return 'Débito';
-        if(m.includes('Dinheiro')) return 'Din';
-        return m;
+    function updateChart() {
+        const ctx = document.getElementById('salesChart');
+        if(!ctx) return; 
+
+        // Aggregate data
+        const counts = {};
+        salesHistory.forEach(s => {
+            const m = s.method || 'Outros';
+            counts[m] = (counts[m] || 0) + s.total; 
+        });
+
+        const labels = Object.keys(counts);
+        const data = Object.values(counts);
+
+        if(myChart) myChart.destroy(); 
+
+        myChart = new Chart(ctx, {
+            type: 'doughnut', 
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: ['#005691', '#27ae60', '#fbc02d', '#e74c3c', '#8e44ad'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' },
+                    title: { display: true, text: 'Faturamento por Método de Pagamento' }
+                }
+            }
+        });
+    }
+
+    // --- NOVA FUNÇÃO PARA TOGGLE MOBILE ---
+    function toggleMobileSales() {
+        const wrapper = document.getElementById('sales-list-wrapper');
+        const btn = document.getElementById('btn-view-sales');
+        
+        if (wrapper.style.display === 'none' || wrapper.style.display === '') {
+            wrapper.style.display = 'block';
+            btn.innerText = '👁️ Ocultar Vendas';
+        } else {
+            wrapper.style.display = 'none';
+            btn.innerText = '👁️ Ver Vendas';
+        }
     }
 
     // --- CORREÇÃO DO TXT (ENCODING E NOME) ---
