@@ -15,7 +15,7 @@
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
 
-        /* --- LAYOUT PC --- */
+        /* --- 1. LAYOUT PC (SIDEBAR) --- */
         .sidebar {
             width: var(--sidebar-width); background: var(--primary); color: white;
             display: flex; flex-direction: column; height: 100vh; z-index: 10;
@@ -32,34 +32,45 @@
         }
         .nav-btn-side:hover { background: rgba(255,255,255,0.1); color: white; padding-left: 30px; }
         .nav-btn-side.active { background: var(--white); color: var(--primary); font-weight: bold; border-right: 5px solid var(--gold); }
+        
         .user-panel { padding: 20px; background: rgba(0,0,0,0.1); text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
 
+        /* --- 2. LAYOUT MOBILE (BARRA INFERIOR) --- */
         .bottom-nav { display: none; }
+
+        /* --- CONTEÚDO PRINCIPAL --- */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
-        .top-bar { background: var(--white); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .top-bar {
+            background: var(--white); height: 60px; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0;
+        }
         .view-container { flex: 1; padding: 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        
+        /* VIEWS */
         .view-section { display: none; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from {opacity:0; transform:translateY(5px);} to {opacity:1; transform:translateY(0);} }
 
-        /* UI ELEMENTS */
+        /* CARDS E UI */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; }
+        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; will-change: transform; content-visibility: auto; }
         .product-card:active { transform: scale(0.98); }
         .product-card img { width: 100%; height: 160px; object-fit: cover; background: #eee; loading: lazy; }
         .info-box { padding: 12px; }
         .size-badge { position: absolute; top: 8px; right: 8px; background: var(--primary); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
+        /* FILTROS */
         .filters-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
         .filters-bar::-webkit-scrollbar { display: none; }
         .btn-filter { background: white; border: 1px solid #ddd; color: #555; border-radius: 20px; padding: 8px 18px; cursor: pointer; white-space: nowrap; transition: 0.2s; font-size: 0.9rem; }
         .btn-filter.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* TABELAS */
+        /* TABELAS (DEFAULT PC) */
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-width: 600px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: #555; font-weight: 600; font-size: 0.85rem; }
         
+        /* FORMULARIOS */
         .form-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; font-size: 1rem; background: #fff; }
         .btn { padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; font-size: 1rem; }
@@ -68,18 +79,33 @@
         .btn-info { background: var(--info); } .btn-dark { background: #34495e; }
         .btn:disabled { background: #b0bec5 !important; color: #fff !important; cursor: not-allowed; }
 
+        /* FLUTUANTES */
         .cart-float { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 900; cursor: pointer; border: 3px solid white; transition: transform 0.2s; }
         .cart-float:active { transform: scale(0.9); }
         .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 2px solid white; font-weight: bold; }
 
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .pulse-loader { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; animation: pulse 1.5s infinite ease-in-out; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; box-shadow: 0 0 20px rgba(0,86,145, 0.4); }
+        /* LOADING (BLUR + PULSE) */
+        .loading-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255, 255, 255, 0.6); 
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; 
+        }
+        .pulse-loader {
+            width: 60px; height: 60px; background: var(--primary); border-radius: 50%;
+            animation: pulse 1.5s infinite ease-in-out; 
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; box-shadow: 0 0 20px rgba(0,86,145, 0.4);
+        }
         @keyframes pulse { 0% { transform: scale(0.9); } 70% { transform: scale(1); } 100% { transform: scale(0.9); } }
 
+        /* LOADER DADOS */
         .data-loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; text-align: center; }
         .data-spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        .data-text { color: var(--primary); font-weight: 600; font-size: 1.1rem; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* MODAIS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .overlay.visible { opacity: 1; }
         .modal-box { background: white; width: 500px; max-width: 90%; padding: 25px; border-radius: 12px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s; }
@@ -91,17 +117,19 @@
         .cart-drawer { position: fixed; top: 0; right: -400px; width: 380px; height: 100%; background: white; z-index: 1100; transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: -5px 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .cart-drawer.open { right: 0; }
 
+        /* BUILDER */
         .builder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .b-list { height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 5px; background: #fafafa; }
         .b-item { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 6px; }
         .b-item:active { background: #e3f2fd; }
         .b-item.selected { background: #e3f2fd; border: 1px solid var(--primary); }
 
+        /* ESTILOS DE VISIBILIDADE PADRÃO (DESKTOP) */
         #sales-list-wrapper { display: block; } 
         #btn-view-sales { display: none; } 
         .chart-container { display: block; } 
 
-        /* --- MOBILE OTIMIZADO --- */
+        /* --- RESPONSIVIDADE (MOBILE OTIMIZADO) --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { display: none; }
@@ -132,42 +160,52 @@
             #sales-list-wrapper { display: none; margin-top: 15px; }
             #btn-view-sales { display: inline-block; } 
 
-            /* --- FINANCEIRO MOBILE SIMPLIFICADO --- */
+            /* --- FINANCEIRO MOBILE (CARDS OTIMIZADOS) --- */
             #table-sales-container { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
             #table-sales-container thead { display: none; }
             #table-sales-container tbody, #table-sales-container tr, #table-sales-container td { display: block; width: 100%; box-sizing: border-box; }
             
-            /* Card da venda */
             #table-sales-container tr {
                 background: white; border: 1px solid #e0e0e0; border-radius: 12px; 
-                margin-bottom: 12px; padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-                display: flex; flex-wrap: wrap; align-items: center;
+                margin-bottom: 15px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+                position: relative; /* Necessário para o absolute do valor */
             }
-            
-            #table-sales-container td { padding: 0; border: none; width: auto; display: block; }
+            #table-sales-container td { padding: 0; border: none; text-align: left; }
 
-            /* ESQUERDA: Data e Itens */
-            #table-sales-container td:nth-child(1) { /* Data */
-                width: 100%; font-size: 0.75rem; color: #888; font-weight: 600; margin-bottom: 5px;
+            /* 1. DATA (Topo Esquerda) */
+            #table-sales-container td:nth-child(1) {
+                font-size: 0.75rem; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;
             }
-            #table-sales-container td:nth-child(2) { display: none; } /* Esconde cliente no mobile (opcional, se quiser mostrar, mude aqui) */
             
-            #table-sales-container td:nth-child(3) { /* Itens */
-                width: 70%; font-size: 0.9rem; color: #444; font-weight: 500;
+            /* 2. CLIENTE (Abaixo da Data) */
+            #table-sales-container td:nth-child(2) {
+                font-size: 1rem; font-weight: 800; color: var(--text); 
+                margin-bottom: 10px; padding-right: 90px; /* Espaço para o valor não sobrepor */
                 white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             }
 
-            /* DIREITA: Valor e Pagamento */
-            #table-sales-container td:nth-child(5) { /* Valor */
-                width: 30%; text-align: right; font-size: 1rem; font-weight: 800; color: var(--success);
+            /* 3. ITENS (Lista no meio) */
+            #table-sales-container td:nth-child(3) {
+                background: #f8f9fa; color: #555; padding: 8px; border-radius: 6px; 
+                font-size: 0.85rem; margin-bottom: 10px; line-height: 1.4; border-left: 3px solid #ddd;
             }
-            
-            #table-sales-container td:nth-child(4) { /* Pagamento */
-                width: 100%; margin-top: 5px; font-size: 0.7rem; color: #666;
-                text-align: right; 
+            #table-sales-container td:nth-child(3)::before { content: '🛒 '; }
+
+            /* 4. PAGAMENTO (Badge em baixo) */
+            #table-sales-container td:nth-child(4) {
+                display: inline-block; font-size: 0.75rem; background: #e3f2fd; color: #1565c0; 
+                padding: 4px 10px; border-radius: 20px; font-weight: 700;
             }
-            /* Formata o badge de pagamento para ficar alinhado com o valor */
-            #table-sales-container td:nth-child(4)::before { content: 'Pago via '; }
+
+            /* 5. VALOR (Topo Direita - CORRIGIDO) */
+            #table-sales-container td:nth-child(5) {
+                position: absolute; top: 12px; right: 12px;
+                font-size: 1.2rem; /* Tamanho ajustado para não quebrar */
+                font-weight: 900; color: var(--success);
+                background: white; /* Fundo branco para garantir leitura */
+                padding-left: 5px;
+                z-index: 2; /* Garante que fique por cima */
+            }
         }
     </style>
 </head>
@@ -212,7 +250,7 @@
 
             <div id="pdv-loader" class="data-loader-container">
                 <div class="data-spinner"></div>
-                <div class="data-text">Carregando...<br>Trazendo suas peças.</div>
+                <div class="data-text">Carregando...<br>Estou trazendo todas as peças.</div>
             </div>
 
             <div id="pdv-grid" class="product-grid" style="display:none;"></div>
@@ -244,7 +282,7 @@
             <h2>Financeiro</h2>
             
             <div style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); display:flex; align-items:center; gap:10px;">
-                <label style="font-weight:bold; color:var(--primary);">📅 Filtro:</label>
+                <label style="font-weight:bold; color:var(--primary);">📅 Filtrar Data:</label>
                 <input type="date" id="fin-date-filter" style="margin:0; flex:1; max-width:200px; padding:8px; border:1px solid #ddd; border-radius:6px;" onchange="renderFinancials()">
                 <button class="btn btn-info" style="padding: 8px; width:auto;" onclick="document.getElementById('fin-date-filter').value=''; renderFinancials();">Todos</button>
             </div>
@@ -268,7 +306,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3 style="margin:0;">Vendas</h3>
                     <div style="display:flex; gap:10px;">
-                        <button id="btn-view-sales" class="btn btn-info" style="padding: 10px 15px; font-size:0.9rem; flex:1;" onclick="toggleMobileSales()">👁️ Ver Lista</button>
+                        <button id="btn-view-sales" class="btn btn-info" style="padding: 10px 15px; font-size:0.9rem; flex:1;" onclick="toggleMobileSales()">👁️ Ver Vendas</button>
                         <button class="btn btn-dark" style="padding: 10px 15px; font-size:0.9rem; flex:1;" onclick="exportReport()">🖨️ Imprimir</button>
                     </div>
                 </div>
@@ -415,6 +453,7 @@
     <h2 style="margin-top:0; text-align:center;">Editar Produto</h2>
     <form onsubmit="saveEdit(event)">
         <input type="hidden" id="edit-id">
+        
         <div class="edit-img-container">
             <img id="edit-preview" class="edit-img-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E">
             <label style="display:block; margin-top:10px; cursor:pointer;">
@@ -422,6 +461,7 @@
                 <input type="file" accept="image/*" style="display:none;" onchange="processImage(this, 'edit')">
             </label>
         </div>
+
         <label>Nome</label><input id="edit-name">
         <label>Tamanho</label>
         <select id="edit-size" style="margin-bottom:15px;">
@@ -431,10 +471,12 @@
             <div style="flex:1"><label>Preço</label><input id="edit-price" type="number" step="0.01"></div>
             <div style="flex:1"><label>Qtd</label><input id="edit-qty" type="number"></div>
         </div>
+        
         <button id="btn-save-edit" class="btn btn-primary" style="width:100%; height:50px; font-size:1.1rem; margin-top:10px;">💾 Atualizar</button>
         <button type="button" class="btn btn-danger" style="width:100%; margin-top:15px; background:#fff; color:var(--danger); border:1px solid var(--danger);" onclick="deleteItem(document.getElementById('edit-id').value)">🗑️ Excluir Produto</button>
     </form>
 </div>
+
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -452,16 +494,20 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    
+    // Tenta cache para velocidade
     db.enablePersistence().catch(e => console.log("Persistencia: " + e.code));
 
     let inventory=[], customers=[], salesHistory=[], cart=[];
     let selTop=null, selBot=null, selectedClient=null, tempImg=null, editImg=null;
-    let modalTimer = null, myChart = null; 
+    let modalTimer = null; 
+    let myChart = null; 
     
     const NO_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E";
 
     window.onload = function() {
-        // NÃO definimos data padrão no filtro para mostrar tudo
+        // NÃO SETAMOS DATA PADRÃO AQUI PARA MOSTRAR TUDO INICIALMENTE
+        
         db.collection("inventory").onSnapshot(s=>{ 
             inventory=[]; 
             s.forEach(d=>inventory.push({...d.data(),id:d.id})); 
@@ -485,67 +531,10 @@
         });
     };
 
-    // --- CORREÇÃO DO FILTRO DE DATA ---
-    function renderFinancials(){
-        const filterDate = document.getElementById('fin-date-filter').value;
-        let filtered = salesHistory;
-        
-        if (filterDate) {
-            filtered = salesHistory.filter(s => {
-                // Se tiver dateIso (vendas novas), usa direto
-                if(s.dateIso) return s.dateIso === filterDate;
-                
-                // Se for venda antiga (DD/MM/YYYY), converte na marra
-                if(s.date) {
-                    try {
-                        const parts = s.date.split(' ')[0].split('/'); // Ex: 05/02/2026
-                        // Garante que dia e mes tenham 2 digitos (05 e não 5)
-                        const day = parts[0].padStart(2, '0');
-                        const month = parts[1].padStart(2, '0');
-                        const year = parts[2];
-                        const formattedIso = `${year}-${month}-${day}`;
-                        return formattedIso === filterDate;
-                    } catch(e) { return false; }
-                }
-                return false;
-            });
-        }
-
-        const tot = filtered.reduce((a,b)=>a+b.total,0); 
-        document.getElementById('fin-total').innerText=tot.toFixed(2); 
-        document.getElementById('fin-count').innerText=filtered.length;
-        
-        const tb=document.getElementById('table-sales'); 
-        
-        if (filtered.length === 0) {
-            tb.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Nenhuma venda encontrada.</td></tr>';
-        } else {
-            tb.innerHTML = filtered.map(s => {
-                const shortMethod = shortenMethod(s.method);
-                return `<tr>
-                    <td>${s.date.split(' ')[0]}</td>
-                    <td>${s.client}</td>
-                    <td style="font-size:0.8rem; color:#555;">${s.items}</td>
-                    <td>${shortMethod}</td>
-                    <td style="font-weight:bold; color:var(--success);">R$ ${s.total.toFixed(2)}</td>
-                </tr>`;
-            }).join('');
-        }
-        updateChart(filtered);
-    }
-
-    function shortenMethod(m) {
-        if(!m) return '-';
-        if(m.includes('Crédito')) return 'Crédito';
-        if(m.includes('Débito')) return 'Débito';
-        if(m.includes('Dinheiro')) return 'Din';
-        return m;
-    }
-
-    // --- FUNÇÕES DE LAYOUT E AÇÃO ---
     function setLoading(isLoading, btnId) {
         const overlay = document.getElementById('loading-overlay');
         if(overlay) overlay.style.display = isLoading ? 'flex' : 'none';
+        
         if(btnId) {
             const btn = document.getElementById(btnId);
             if(btn) {
@@ -565,6 +554,7 @@
         if(id==='financeiro' && prompt('Senha:')!=='litorallu') return;
         document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+        
         document.querySelectorAll('.nav-btn-side, .nav-btn-mobile').forEach(b=>b.classList.remove('active'));
         if(document.getElementById('side-'+id)) document.getElementById('side-'+id).classList.add('active');
         if(document.getElementById('mob-'+id)) document.getElementById('mob-'+id).classList.add('active');
@@ -609,8 +599,10 @@
     function filterPDV(t,b){ pdvFilter=t; document.querySelectorAll('.btn-filter').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderPDV(); }
     
     function renderPDV() {
-        const g = document.getElementById('pdv-grid'); if(!g) return;
+        const g = document.getElementById('pdv-grid'); 
+        if(!g) return;
         const t = document.getElementById('pdv-search').value.toLowerCase(); 
+        
         const html = inventory.filter(i=>{
             const n = i.name ? i.name.toLowerCase() : '';
             return (pdvFilter==='todos'||i.type===pdvFilter) && n.includes(t);
@@ -650,7 +642,8 @@
 
     function searchCheckoutClient() {
         const t = document.getElementById('chk-search-cli').value.toLowerCase(); 
-        const r = document.getElementById('chk-results'); if(!r) return;
+        const r = document.getElementById('chk-results'); 
+        if(!r) return;
         r.style.display='block';
         r.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(t)).map(c => 
             `<div style="padding:10px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selCli('${c.id}')">${c.name}</div>`
@@ -677,13 +670,10 @@
         const cliName = selectedClient ? selectedClient.name : 'Avulso';
         
         const today = new Date();
-        // Ajuste fuso horário simples para garantir data correta no Brasil
-        const dateIso = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-
         const saleRef = db.collection('sales').doc();
         batch.set(saleRef, {
-            date: today.toLocaleString('pt-BR'), 
-            dateIso: dateIso, 
+            date: new Date().toLocaleString(), 
+            dateIso: today.toISOString().split('T')[0], 
             client: cliName, 
             total: tot,
             method: method, 
@@ -693,50 +683,253 @@
         
         batch.commit()
         .then(()=>{ 
-            setLoading(false); alert('Venda Realizada!'); 
-            cart = []; renderCart(); document.getElementById('cart-count').innerText='0';
-            selectedClient = null; document.getElementById('chk-selected-cli').style.display='none';
-            document.getElementById('chk-search-cli').value=''; closeAll(); 
+            setLoading(false); 
+            alert('Venda Realizada com Sucesso!'); 
+            cart = []; 
+            renderCart();
+            document.getElementById('cart-count').innerText='0';
+            selectedClient = null;
+            document.getElementById('chk-selected-cli').style.display='none';
+            document.getElementById('chk-search-cli').value='';
+            closeAll(); 
         })
-        .catch(err=>{ setLoading(false); alert('Erro.'); });
+        .catch(err=>{
+            setLoading(false); 
+            console.error(err);
+            alert('Erro ao finalizar venda: Verifique sua conexão.');
+        });
+    }
+
+    function processImage(input, m) {
+        if(input.files[0]) {
+            const r = new FileReader(); r.onload=e=>{
+                const i=new Image(); i.onload=()=>{
+                    const c=document.createElement('canvas'); const x=c.getContext('2d'); c.width=200; c.height=(i.height*200)/i.width; x.drawImage(i,0,0,c.width,c.height);
+                    const d=c.toDataURL('image/jpeg',0.6);
+                    if(m==='new'){ tempImg=d; document.getElementById('cad-preview').src=d; document.getElementById('cad-preview').style.display='block'; }
+                    else { editImg=d; document.getElementById('edit-preview').src=d; }
+                }; i.src=e.target.result;
+            }; r.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    function saveProduct(e) {
+        e.preventDefault();
+        setLoading(true, 'btn-save-new');
+        db.collection('inventory').add({
+            name: document.getElementById('cad-name').value, type: document.getElementById('cad-type').value,
+            size: document.getElementById('cad-size').value, price: parseFloat(document.getElementById('cad-price').value),
+            qty: parseInt(document.getElementById('cad-qty').value), img: tempImg, createdAt: new Date()
+        })
+        .then(()=>{ 
+            alert('Produto Salvo!'); e.target.reset(); tempImg=null; document.getElementById('cad-preview').style.display='none'; 
+        })
+        .catch(err => alert('Erro: ' + err))
+        .finally(() => setLoading(false, 'btn-save-new'));
+    }
+    
+    function renderStock() {
+        const t = document.getElementById('stock-search').value.toLowerCase(); const tb = document.getElementById('table-stock'); 
+        tb.innerHTML = inventory.filter(i=>(i.name||'').toLowerCase().includes(t)).map(i => 
+            `<tr><td>${i.name}</td><td>${i.size}</td><td>${i.price}</td><td>${i.qty}</td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td></tr>`
+        ).join('');
+    }
+    
+    function openEdit(id) {
+        const i=inventory.find(x=>x.id===id); 
+        document.getElementById('edit-id').value=id; 
+        document.getElementById('edit-name').value=i.name;
+        document.getElementById('edit-price').value=i.price; 
+        document.getElementById('edit-qty').value=i.qty;
+        document.getElementById('edit-size').value = i.size || 'U';
+        editImg=i.img; 
+        document.getElementById('edit-preview').src = i.img || NO_IMG;
+        openModal('modal-edit');
+    }
+    
+    function saveEdit(e) {
+        e.preventDefault(); 
+        setLoading(true, 'btn-save-edit');
+        const id=document.getElementById('edit-id').value;
+        const u = { 
+            name:document.getElementById('edit-name').value, 
+            price:parseFloat(document.getElementById('edit-price').value), 
+            qty:parseInt(document.getElementById('edit-qty').value),
+            size:document.getElementById('edit-size').value
+        };
+        if(editImg) u.img=editImg; 
+        db.collection('inventory').doc(id).update(u)
+        .then(()=>{ closeAll(); alert('Atualizado!'); })
+        .catch(err => alert('Erro: ' + err))
+        .finally(() => setLoading(false, 'btn-save-edit'));
+    }
+    
+    function deleteItem(id){ 
+        if(confirm('Excluir este item permanentemente?')) {
+            setLoading(true);
+            db.collection('inventory').doc(id).delete().then(()=>{ closeAll(); }).finally(() => setLoading(false));
+        }
+    }
+
+    function saveCustomer(e){ e.preventDefault(); db.collection('customers').add({name:document.getElementById('cli-name').value, phone:document.getElementById('cli-phone').value}).then(()=>{ closeAll(); alert('Cliente Salvo'); }); }
+    function renderCustomers(){ 
+        const tb=document.getElementById('table-cli'); 
+        tb.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(document.getElementById('search-cli').value.toLowerCase())).map(c => 
+            `<tr><td>${c.name}</td><td>${c.phone}</td></tr>`
+        ).join('');
+    }
+    
+    function shortenMethod(m) {
+        if(!m) return '-';
+        if(m.includes('Crédito')) return 'Crédito';
+        if(m.includes('Débito')) return 'Débito';
+        if(m.includes('Dinheiro')) return 'Din';
+        return m;
+    }
+
+    function renderFinancials(){
+        const filterDate = document.getElementById('fin-date-filter').value;
+        
+        let filtered = salesHistory;
+        
+        // SÓ FILTRA SE TIVER DATA SELECIONADA
+        if (filterDate) {
+            filtered = salesHistory.filter(s => {
+                if(!s.dateIso && s.date) {
+                    const parts = s.date.split(' ')[0].split('/'); 
+                    const iso = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    return iso === filterDate;
+                }
+                return s.dateIso === filterDate;
+            });
+        }
+
+        const tot = filtered.reduce((a,b)=>a+b.total,0); 
+        document.getElementById('fin-total').innerText=tot.toFixed(2); 
+        document.getElementById('fin-count').innerText=filtered.length;
+        
+        const tb=document.getElementById('table-sales'); 
+        
+        if (filtered.length === 0) {
+            tb.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Nenhuma venda encontrada.</td></tr>';
+        } else {
+            tb.innerHTML = filtered.map(s => {
+                const shortMethod = shortenMethod(s.method);
+                return `<tr>
+                    <td>${s.date.split(' ')[0]}</td>
+                    <td>${s.client}</td>
+                    <td style="font-size:0.8rem; color:#555;">${s.items}</td>
+                    <td>${shortMethod}</td>
+                    <td style="font-weight:bold; color:var(--success);">R$ ${s.total.toFixed(2)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        updateChart(filtered);
     }
 
     function updateChart(data) {
         const ctx = document.getElementById('salesChart');
         if(!ctx) return; 
+
         const counts = {};
-        data.forEach(s => { const m = s.method || 'Outros'; counts[m] = (counts[m] || 0) + s.total; });
+        data.forEach(s => {
+            const m = s.method || 'Outros';
+            counts[m] = (counts[m] || 0) + s.total; 
+        });
+
         const labels = Object.keys(counts);
         const values = Object.values(counts);
+
         if(myChart) myChart.destroy(); 
+
         myChart = new Chart(ctx, {
             type: 'doughnut', 
-            data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#005691', '#27ae60', '#fbc02d', '#e74c3c', '#8e44ad'], borderWidth: 1 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' }, title: { display: true, text: 'Faturamento (Filtrado)' } } }
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#005691', '#27ae60', '#fbc02d', '#e74c3c', '#8e44ad'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' },
+                    title: { display: true, text: 'Faturamento (Filtrado)' }
+                }
+            }
         });
     }
 
     function toggleMobileSales() {
         const wrapper = document.getElementById('sales-list-wrapper');
         const btn = document.getElementById('btn-view-sales');
+        
         if (wrapper.style.display === 'none' || wrapper.style.display === '') {
-            wrapper.style.display = 'block'; btn.innerText = '👁️ Ocultar Vendas';
+            wrapper.style.display = 'block';
+            btn.innerText = '👁️ Ocultar Vendas';
         } else {
-            wrapper.style.display = 'none'; btn.innerText = '👁️ Ver Vendas';
+            wrapper.style.display = 'none';
+            btn.innerText = '👁️ Ver Vendas';
         }
     }
 
     function exportReport(){
         const filterDate = document.getElementById('fin-date-filter').value;
         let filtered = salesHistory;
+
+        // Se tiver data, filtra. Se não, imprime tudo.
         if(filterDate) {
             filtered = salesHistory.filter(s => {
-                if(s.dateIso) return s.dateIso === filterDate;
-                if(s.date) {
-                    try {
-                        const parts = s.date.split(' ')[0].split('/');
-                        const day = parts[0].padStart(2, '0');
-                        const month = parts[1].padStart(2, '0');
-                        const year = parts[2];
-                        return `${year}-${month}-${day}` === filterDate;
-                    } catch
+                if(!s.dateIso && s.date) {
+                    const parts = s.date.split(' ')[0].split('/');
+                    const iso = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    return iso === filterDate;
+                }
+                return s.dateIso === filterDate;
+            });
+        }
+
+        if(filtered.length === 0) return alert("Nada para imprimir com este filtro.");
+
+        let t = "Relatorio Financeiro Litoral Brasil\n";
+        t += filterDate ? `Data: ${filterDate.split('-').reverse().join('/')}\n` : "Periodo: Geral\n";
+        t += "-----------------------------------\n";
+        
+        filtered.forEach(s => {
+            const shortMethod = shortenMethod(s.method);
+            t += `${s.date} | ${s.client} | ${shortMethod} | R$ ${s.total.toFixed(2)}\nItem: ${s.items}\n----------------\n`;
+        });
+        
+        const tot = filtered.reduce((a,b)=>a+b.total,0);
+        t += `\nTOTAL DO PERIODO: R$ ${tot.toFixed(2)}`;
+
+        const blob = new Blob(["\uFEFF"+t], {type: 'text/plain;charset=utf-8'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Caixa_${filterDate || 'Geral'}.txt`;
+        a.click();
+    }
+
+    function openBuilder(){ 
+        selTop=null; selBot=null; openModal('modal-builder'); 
+        const rt=document.getElementById('list-tops'); const rb=document.getElementById('list-bottoms'); 
+        rt.innerHTML = inventory.filter(i=>i.type==='Sutiã'&&i.qty>0).map(i => 
+            `<div class="b-item" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`
+        ).join('');
+        rb.innerHTML = inventory.filter(i=>i.type==='Calcinha'&&i.qty>0).map(i => 
+            `<div class="b-item" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`
+        ).join('');
+    }
+    function selPart(t,id,el){
+        const i=inventory.find(x=>x.id===id); if(t==='top')selTop=i; else selBot=i;
+        Array.from(el.parentNode.children).forEach(c=>c.classList.remove('selected')); el.classList.add('selected');
+        document.getElementById('build-total').innerText=((selTop?selTop.price:0)+(selBot?selBot.price:0)).toFixed(2);
+    }
+    function addComboToCart(){ if(selTop)addToCart(selTop.id); if(selBot)addToCart(selBot.id); closeAll(); }
+</script>
+</body>
+</html>
