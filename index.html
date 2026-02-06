@@ -15,7 +15,7 @@
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
 
-        /* --- 1. LAYOUT PC (SIDEBAR) --- */
+        /* --- LAYOUT PC --- */
         .sidebar {
             width: var(--sidebar-width); background: var(--primary); color: white;
             display: flex; flex-direction: column; height: 100vh; z-index: 10;
@@ -35,10 +35,8 @@
         
         .user-panel { padding: 20px; background: rgba(0,0,0,0.1); text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
 
-        /* --- 2. LAYOUT MOBILE (BARRA INFERIOR) --- */
         .bottom-nav { display: none; }
 
-        /* --- CONTEÚDO PRINCIPAL --- */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
         .top-bar {
             background: var(--white); height: 60px; display: flex; align-items: center;
@@ -46,12 +44,11 @@
         }
         .view-container { flex: 1; padding: 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
-        /* VIEWS */
         .view-section { display: none; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from {opacity:0; transform:translateY(5px);} to {opacity:1; transform:translateY(0);} }
 
-        /* CARDS E UI */
+        /* UI ELEMENTS */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; will-change: transform; content-visibility: auto; }
         .product-card:active { transform: scale(0.98); }
@@ -59,18 +56,15 @@
         .info-box { padding: 12px; }
         .size-badge { position: absolute; top: 8px; right: 8px; background: var(--primary); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        /* FILTROS */
         .filters-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
         .filters-bar::-webkit-scrollbar { display: none; }
         .btn-filter { background: white; border: 1px solid #ddd; color: #555; border-radius: 20px; padding: 8px 18px; cursor: pointer; white-space: nowrap; transition: 0.2s; font-size: 0.9rem; }
         .btn-filter.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* TABELAS (DEFAULT PC) */
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-width: 600px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: #555; font-weight: 600; font-size: 0.85rem; }
         
-        /* FORMULARIOS */
         .form-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; font-size: 1rem; background: #fff; }
         .btn { padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; font-size: 1rem; }
@@ -79,33 +73,19 @@
         .btn-info { background: var(--info); } .btn-dark { background: #34495e; }
         .btn:disabled { background: #b0bec5 !important; color: #fff !important; cursor: not-allowed; }
 
-        /* FLUTUANTES */
         .cart-float { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 900; cursor: pointer; border: 3px solid white; transition: transform 0.2s; }
         .cart-float:active { transform: scale(0.9); }
         .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 2px solid white; font-weight: bold; }
 
-        /* LOADING */
-        .loading-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(255, 255, 255, 0.6); 
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; 
-        }
-        .pulse-loader {
-            width: 60px; height: 60px; background: var(--primary); border-radius: 50%;
-            animation: pulse 1.5s infinite ease-in-out; 
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.5rem; box-shadow: 0 0 20px rgba(0,86,145, 0.4);
-        }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .pulse-loader { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; animation: pulse 1.5s infinite ease-in-out; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; box-shadow: 0 0 20px rgba(0,86,145, 0.4); }
         @keyframes pulse { 0% { transform: scale(0.9); } 70% { transform: scale(1); } 100% { transform: scale(0.9); } }
 
-        /* LOADER DADOS */
         .data-loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; text-align: center; }
         .data-spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         .data-text { color: var(--primary); font-weight: 600; font-size: 1.1rem; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* MODAIS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .overlay.visible { opacity: 1; }
         .modal-box { background: white; width: 500px; max-width: 90%; padding: 25px; border-radius: 12px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s; }
@@ -117,19 +97,17 @@
         .cart-drawer { position: fixed; top: 0; right: -400px; width: 380px; height: 100%; background: white; z-index: 1100; transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: -5px 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .cart-drawer.open { right: 0; }
 
-        /* BUILDER */
         .builder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .b-list { height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 5px; background: #fafafa; }
         .b-item { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 6px; }
         .b-item:active { background: #e3f2fd; }
         .b-item.selected { background: #e3f2fd; border: 1px solid var(--primary); }
 
-        /* ESTILOS DE VISIBILIDADE PADRÃO (DESKTOP) */
         #sales-list-wrapper { display: block; } 
         #btn-view-sales { display: none; } 
-        .chart-container { display: block; } /* Grafico visivel no PC */
+        .chart-container { display: block; } 
 
-        /* --- RESPONSIVIDADE (MOBILE OTIMIZADO) --- */
+        /* --- MOBILE --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { display: none; }
@@ -156,14 +134,11 @@
             .cart-drawer { width: 100%; right: -100%; }
             .modal-box { width: 95%; padding: 20px; }
 
-            /* Ocultar grafico no mobile */
             .chart-container { display: none !important; }
+            #sales-list-wrapper { display: none; margin-top: 15px; }
+            #btn-view-sales { display: inline-block; } 
 
-            /* --- MUDANÇAS ESPECÍFICAS PARA O FINANCEIRO MOBILE --- */
-            #sales-list-wrapper { display: none; margin-top: 15px; } /* Esconde lista no mobile */
-            #btn-view-sales { display: inline-block; } /* Mostra botão ver vendas */
-
-            /* Layout de Cards no Financeiro */
+            /* --- FINANCEIRO MOBILE (CARDS) --- */
             #table-sales-container { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
             #table-sales-container thead { display: none; }
             #table-sales-container tbody, #table-sales-container tr, #table-sales-container td { display: block; width: 100%; box-sizing: border-box; }
@@ -174,11 +149,24 @@
             }
             #table-sales-container td { padding: 0; border: none; text-align: left; }
 
-            #table-sales-container td:nth-child(1) { font-size: 0.75rem; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-            #table-sales-container td:nth-child(5) { position: absolute; top: 15px; right: 15px; font-size: 1.4rem; font-weight: 900; color: var(--success); }
-            #table-sales-container td:nth-child(2) { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 10px; padding-right: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            #table-sales-container td:nth-child(3) { background: #f8f9fa; color: #555; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 10px; line-height: 1.4; border-left: 3px solid #ddd; }
+            /* AJUSTE DATA */
+            #table-sales-container td:nth-child(1) { font-size: 0.75rem; color: #999; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+            
+            /* AJUSTE VALOR (MENOR E NÃO SOBREPÕE) */
+            #table-sales-container td:nth-child(5) { 
+                position: absolute; top: 12px; right: 12px; 
+                font-size: 1.1rem; /* Diminuído de 1.4rem */
+                font-weight: 800; color: var(--success); 
+            }
+
+            /* CLIENTE */
+            #table-sales-container td:nth-child(2) { font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 10px; padding-right: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            
+            /* ITENS */
+            #table-sales-container td:nth-child(3) { background: #f8f9fa; color: #555; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 10px; line-height: 1.4; border-left: 3px solid #ddd; }
             #table-sales-container td:nth-child(3)::before { content: '🛒 '; }
+            
+            /* PAGAMENTO */
             #table-sales-container td:nth-child(4) { display: inline-block; font-size: 0.8rem; background: #e3f2fd; color: #1565c0; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
         }
     </style>
@@ -255,24 +243,29 @@
         <section id="financeiro" class="view-section">
             <h2>Financeiro</h2>
             
+            <div style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); display:flex; align-items:center; gap:10px;">
+                <label style="font-weight:bold; color:var(--primary);">📅 Data:</label>
+                <input type="date" id="fin-date-filter" style="margin:0; flex:1; max-width:200px; padding:8px; border:1px solid #ddd; border-radius:6px;" onchange="renderFinancials()">
+            </div>
+
             <div class="chart-container" style="background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); height: 350px; position: relative;">
                 <canvas id="salesChart"></canvas>
             </div>
 
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:30px;">
                 <div style="background:white; padding:20px; border-radius:12px; border-left:5px solid var(--success); box-shadow:0 4px 15px rgba(0,0,0,0.05);">
-                    <small style="color:#888; font-weight:600; text-transform:uppercase;">Faturamento</small>
+                    <small style="color:#888; font-weight:600; text-transform:uppercase;">Faturamento (Dia)</small>
                     <div style="font-size:1.8rem; font-weight:bold; color:var(--text);">R$ <span id="fin-total">0.00</span></div>
                 </div>
                 <div style="background:white; padding:20px; border-radius:12px; border-left:5px solid var(--info); box-shadow:0 4px 15px rgba(0,0,0,0.05);">
-                    <small style="color:#888; font-weight:600; text-transform:uppercase;">Vendas</small>
+                    <small style="color:#888; font-weight:600; text-transform:uppercase;">Vendas (Dia)</small>
                     <div style="font-size:1.8rem; font-weight:bold; color:var(--text);"><span id="fin-count">0</span></div>
                 </div>
             </div>
             
             <div class="form-card" style="margin:0; max-width:100%; padding: 15px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h3 style="margin:0;">Últimas Vendas</h3>
+                    <h3 style="margin:0;">Vendas do Dia</h3>
                     <div style="display:flex; gap:10px;">
                         <button id="btn-view-sales" class="btn btn-info" style="padding: 10px 15px; font-size:0.9rem; flex:1;" onclick="toggleMobileSales()">👁️ Ver Vendas</button>
                         <button class="btn btn-dark" style="padding: 10px 15px; font-size:0.9rem; flex:1;" onclick="exportReport()">🖨️ Imprimir</button>
@@ -463,27 +456,27 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     
-    // Tenta cache para velocidade, ignora se der erro
+    // Tenta cache para velocidade
     db.enablePersistence().catch(e => console.log("Persistencia: " + e.code));
 
     let inventory=[], customers=[], salesHistory=[], cart=[];
     let selTop=null, selBot=null, selectedClient=null, tempImg=null, editImg=null;
     let modalTimer = null; 
-    let myChart = null; // Para o gráfico
+    let myChart = null; 
     
     const NO_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E";
 
     window.onload = function() {
-        // Carregamento Otimizado
+        // SETA DATA DE HOJE NO FILTRO
+        document.getElementById('fin-date-filter').valueAsDate = new Date();
+
         db.collection("inventory").onSnapshot(s=>{ 
             inventory=[]; 
             s.forEach(d=>inventory.push({...d.data(),id:d.id})); 
-            // Esconde loader e mostra dados
             const loader = document.getElementById('pdv-loader');
             if(loader) loader.style.display = 'none';
             const grid = document.getElementById('pdv-grid');
             if(grid) grid.style.display = 'grid';
-            
             renderPDV(); renderStock(); 
         });
         
@@ -493,14 +486,13 @@
             renderCustomers(); 
         });
         
-        db.collection("sales").orderBy("timestamp","desc").limit(50).onSnapshot(s=>{ 
+        db.collection("sales").orderBy("timestamp","desc").limit(100).onSnapshot(s=>{ 
             salesHistory=[]; 
             s.forEach(d=>salesHistory.push({...d.data(),id:d.id})); 
             renderFinancials(); 
         });
     };
 
-    // --- HELPER DE LOADING & BLOQUEIO ---
     function setLoading(isLoading, btnId) {
         const overlay = document.getElementById('loading-overlay');
         if(overlay) overlay.style.display = isLoading ? 'flex' : 'none';
@@ -520,7 +512,6 @@
         }
     }
 
-    // --- NAVEGAÇÃO ---
     function nav(id) {
         if(id==='financeiro' && prompt('Senha:')!=='litorallu') return;
         document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
@@ -532,17 +523,11 @@
     }
 
     function closeAll() {
-        // Fecha Gaveta e Overlay da Gaveta
         document.getElementById('overlay').style.display='none';
         document.getElementById('cart-drawer').classList.remove('open');
-        
-        // Fecha Modais com animação
         const modalOverlay = document.getElementById('modal-overlay');
         modalOverlay.classList.remove('visible');
-        
-        // Limpa timer anterior para não encavalar
         if(modalTimer) clearTimeout(modalTimer);
-        
         modalTimer = setTimeout(() => {
             modalOverlay.style.display = 'none';
             document.querySelectorAll('.modal-box').forEach(m => m.style.display = 'none');
@@ -550,17 +535,11 @@
     }
     
     function openModal(id) { 
-        // Se tiver timer de fechar rodando, cancela ele agora!
         if(modalTimer) clearTimeout(modalTimer);
-
         const overlay = document.getElementById('modal-overlay');
-        // Garante que todos os outros modais fechem antes de abrir o novo
         document.querySelectorAll('.modal-box').forEach(m => m.style.display = 'none');
-        
         overlay.style.display = 'flex';
-        // Pequeno delay para a animação CSS pegar
         setTimeout(()=>overlay.classList.add('visible'), 10);
-        
         const modal = document.getElementById(id);
         if(modal) modal.style.display='block'; 
     }
@@ -571,18 +550,13 @@
         renderCart();
     }
 
-    // --- CORREÇÃO DO BUG: OPEN CHECKOUT ---
     function openCheckout(){ 
         if(!cart.length) return alert("Carrinho vazio!");
-        
-        document.getElementById('cart-drawer').classList.remove('open'); // Fecha gaveta
-        document.getElementById('overlay').style.display='none'; // Fecha fundo da gaveta
-        
-        // Abre modal de pagamento imediatamente
+        document.getElementById('cart-drawer').classList.remove('open'); 
+        document.getElementById('overlay').style.display='none'; 
         openModal('modal-checkout'); 
     }
 
-    // --- LÓGICA PDV ---
     let pdvFilter = 'todos';
     function filterPDV(t,b){ pdvFilter=t; document.querySelectorAll('.btn-filter').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderPDV(); }
     
@@ -608,12 +582,6 @@
         const i = inventory.find(x=>x.id===id); if(i.qty<1) return alert('Sem Estoque');
         const h = cart.find(x=>x.id===id); if(h) h.q++; else cart.push({...i,q:1});
         document.getElementById('cart-count').innerText = cart.reduce((a,b)=>a+b.q,0);
-        // Feedback visual
-        const btn = document.querySelector('.cart-float');
-        btn.style.transform = "scale(1.2)";
-        setTimeout(()=>btn.style.transform = "scale(1)", 200);
-        
-        // AQUI: ABRE O CARRINHO DIRETO
         toggleCartDrawer();
     }
     
@@ -640,7 +608,6 @@
         const r = document.getElementById('chk-results'); 
         if(!r) return;
         r.style.display='block';
-        
         r.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(t)).map(c => 
             `<div style="padding:10px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selCli('${c.id}')">${c.name}</div>`
         ).join('');
@@ -652,31 +619,24 @@
         document.getElementById('chk-results').style.display='none'; 
     }
 
-    // --- FUNÇÃO DE FINALIZAR VENDA (REFORÇADA) ---
     function finishSale() {
         if(cart.length === 0) return alert("Carrinho vazio!");
-        
-        // Bloqueia tela imediatamente
         setLoading(true);
-        
         const batch = db.batch();
-        
-        // Atualiza estoque
         cart.forEach(c=>{ 
             const ref = db.collection('inventory').doc(c.id);
-            // Proteção: não deixa estoque ficar negativo
             const novaQtd = Math.max(0, c.qty - c.q);
             batch.update(ref, {qty: novaQtd}); 
         });
-        
         const tot = parseFloat(document.getElementById('chk-total').innerText);
         const method = document.getElementById('chk-method').value;
         const cliName = selectedClient ? selectedClient.name : 'Avulso';
         
-        // Cria registro da venda
+        const today = new Date();
         const saleRef = db.collection('sales').doc();
         batch.set(saleRef, {
             date: new Date().toLocaleString(), 
+            dateIso: today.toISOString().split('T')[0], 
             client: cliName, 
             total: tot,
             method: method, 
@@ -684,7 +644,6 @@
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        // Envia pro Firebase
         batch.commit()
         .then(()=>{ 
             setLoading(false); 
@@ -704,7 +663,6 @@
         });
     }
 
-    // --- CRUD ---
     function processImage(input, m) {
         if(input.files[0]) {
             const r = new FileReader(); r.onload=e=>{
@@ -763,7 +721,6 @@
             size:document.getElementById('edit-size').value
         };
         if(editImg) u.img=editImg; 
-        
         db.collection('inventory').doc(id).update(u)
         .then(()=>{ closeAll(); alert('Atualizado!'); })
         .catch(err => alert('Erro: ' + err))
@@ -785,7 +742,6 @@
         ).join('');
     }
     
-    // --- FUNÇÃO PARA ABREVIAR NOMES ---
     function shortenMethod(m) {
         if(!m) return '-';
         if(m.includes('Crédito')) return 'Crédito';
@@ -795,37 +751,52 @@
     }
 
     function renderFinancials(){
-        const tot=salesHistory.reduce((a,b)=>a+b.total,0); document.getElementById('fin-total').innerText=tot.toFixed(2); document.getElementById('fin-count').innerText=salesHistory.length;
+        const filterDate = document.getElementById('fin-date-filter').value;
+        const filtered = salesHistory.filter(s => {
+            if(!s.dateIso && s.date) {
+                const parts = s.date.split(' ')[0].split('/'); 
+                const iso = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                return iso === filterDate;
+            }
+            return s.dateIso === filterDate;
+        });
+
+        const tot = filtered.reduce((a,b)=>a+b.total,0); 
+        document.getElementById('fin-total').innerText=tot.toFixed(2); 
+        document.getElementById('fin-count').innerText=filtered.length;
+        
         const tb=document.getElementById('table-sales'); 
         
-        tb.innerHTML = salesHistory.map(s => {
-            const shortMethod = shortenMethod(s.method);
-            return `<tr>
-                <td>${s.date.split(' ')[0]}</td>
-                <td>${s.client}</td>
-                <td style="font-size:0.8rem; color:#555;">${s.items}</td>
-                <td>${shortMethod}</td>
-                <td style="font-weight:bold; color:var(--success);">R$ ${s.total.toFixed(2)}</td>
-            </tr>`;
-        }).join('');
+        if (filtered.length === 0) {
+            tb.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Nenhuma venda nesta data.</td></tr>';
+        } else {
+            tb.innerHTML = filtered.map(s => {
+                const shortMethod = shortenMethod(s.method);
+                return `<tr>
+                    <td>${s.date.split(' ')[0]}</td>
+                    <td>${s.client}</td>
+                    <td style="font-size:0.8rem; color:#555;">${s.items}</td>
+                    <td>${shortMethod}</td>
+                    <td style="font-weight:bold; color:var(--success);">R$ ${s.total.toFixed(2)}</td>
+                </tr>`;
+            }).join('');
+        }
 
-        // ATUALIZA GRÁFICO (SOMENTE DESKTOP)
-        updateChart();
+        updateChart(filtered);
     }
 
-    function updateChart() {
+    function updateChart(data) {
         const ctx = document.getElementById('salesChart');
         if(!ctx) return; 
 
-        // Aggregate data
         const counts = {};
-        salesHistory.forEach(s => {
+        data.forEach(s => {
             const m = s.method || 'Outros';
             counts[m] = (counts[m] || 0) + s.total; 
         });
 
         const labels = Object.keys(counts);
-        const data = Object.values(counts);
+        const values = Object.values(counts);
 
         if(myChart) myChart.destroy(); 
 
@@ -834,7 +805,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    data: data,
+                    data: values,
                     backgroundColor: ['#005691', '#27ae60', '#fbc02d', '#e74c3c', '#8e44ad'],
                     borderWidth: 1
                 }]
@@ -844,13 +815,12 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { position: 'right' },
-                    title: { display: true, text: 'Faturamento por Método de Pagamento' }
+                    title: { display: true, text: 'Faturamento do Dia' }
                 }
             }
         });
     }
 
-    // --- NOVA FUNÇÃO PARA TOGGLE MOBILE ---
     function toggleMobileSales() {
         const wrapper = document.getElementById('sales-list-wrapper');
         const btn = document.getElementById('btn-view-sales');
@@ -864,21 +834,35 @@
         }
     }
 
-    // --- CORREÇÃO DO TXT (ENCODING E NOME) ---
     function exportReport(){
-        let t = "Relatorio Financeiro Litoral Brasil\n";
+        const filterDate = document.getElementById('fin-date-filter').value;
+        // Lógica de filtro para exportação (igual ao render)
+        const filtered = salesHistory.filter(s => {
+            if(!s.dateIso && s.date) {
+                const parts = s.date.split(' ')[0].split('/');
+                const iso = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                return iso === filterDate;
+            }
+            return s.dateIso === filterDate;
+        });
+
+        if(filtered.length === 0) return alert("Nada para imprimir nesta data.");
+
+        let t = `Relatorio Financeiro - ${filterDate.split('-').reverse().join('/')}\n`;
         t += "-----------------------------------\n";
         
-        salesHistory.forEach(s => {
+        filtered.forEach(s => {
             const shortMethod = shortenMethod(s.method);
             t += `${s.date} | ${s.client} | ${shortMethod} | R$ ${s.total.toFixed(2)}\nItem: ${s.items}\n----------------\n`;
         });
+        
+        const tot = filtered.reduce((a,b)=>a+b.total,0);
+        t += `\nTOTAL DO DIA: R$ ${tot.toFixed(2)}`;
 
-        // O "\uFEFF" é a mágica que faz o Windows abrir com acentos certos
         const blob = new Blob(["\uFEFF"+t], {type: 'text/plain;charset=utf-8'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'Relatorio_Litoral_Brasil.txt';
+        a.download = `Caixa_${filterDate}.txt`;
         a.click();
     }
 
