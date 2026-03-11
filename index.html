@@ -10,7 +10,7 @@
             --primary: #005691; --primary-dark: #004472; --gold: #fbc02d;
             --bg: #f4f6f9; --white: #ffffff; --text: #333333;
             --sidebar-width: 250px;
-            --success: #27ae60; --danger: #e74c3c; --info: #3498db; --pink: #e84393;
+            --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; --info: #3498db; --pink: #e84393;
         }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
@@ -44,13 +44,13 @@
 
         /* UI ELEMENTS */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; }
+        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; position: relative; border: 1px solid transparent; }
         .product-card:active { transform: scale(0.98); }
         .product-card img { width: 100%; height: 160px; object-fit: cover; background: #eee; loading: lazy; }
         .info-box { padding: 12px; }
         .size-badge { position: absolute; top: 8px; right: 8px; background: var(--primary); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        .filters-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
+        .filters-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; scrollbar-width: none; flex-wrap: nowrap; }
         .filters-bar::-webkit-scrollbar { display: none; }
         .btn-filter { background: white; border: 1px solid #ddd; color: #555; border-radius: 20px; padding: 8px 18px; cursor: pointer; white-space: nowrap; transition: 0.2s; font-size: 0.9rem; }
         .btn-filter.active { background: var(--primary); color: white; border-color: var(--primary); }
@@ -62,7 +62,7 @@
         
         .form-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; font-size: 1rem; background: #fff; }
-        .btn { padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; font-size: 1rem; }
+        .btn { padding: 12px 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; font-size: 0.95rem; }
         .btn-primary { background: var(--primary); } .btn-success { background: var(--success); }
         .btn-danger { background: var(--danger); } .btn-pink { background: var(--pink); }
         .btn-info { background: var(--info); } .btn-dark { background: #34495e; }
@@ -93,14 +93,20 @@
         .cart-drawer.open { right: 0; }
 
         .builder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .b-list { height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 5px; background: #fafafa; }
-        .b-item { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 6px; }
+        .b-list { height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 5px; background: #fafafa; }
+        .b-item { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 6px; font-size: 0.9rem;}
         .b-item:active { background: #e3f2fd; }
         .b-item.selected { background: #e3f2fd; border: 1px solid var(--primary); }
 
         #sales-list-wrapper { display: block; } 
         #btn-view-sales { display: none; } 
         .chart-container { display: block; } 
+
+        /* Cores de Alerta de Estoque */
+        .row-warning { background-color: #fff3e0 !important; }
+        .row-warning td { color: #d35400; font-weight: 500; }
+        .row-danger { background-color: #ffebee !important; }
+        .row-danger td { color: #c0392b; font-weight: bold; }
 
         /* --- MOBILE OTIMIZADO --- */
         @media (max-width: 768px) {
@@ -133,7 +139,7 @@
             #sales-list-wrapper { display: none; margin-top: 15px; }
             #btn-view-sales { display: inline-block; } 
 
-            /* --- FINANCEIRO MOBILE (CARDS OTIMIZADOS) --- */
+            /* --- FINANCEIRO MOBILE --- */
             #table-sales-container { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
             #table-sales-container thead { display: none; }
             #table-sales-container tbody, #table-sales-container tr, #table-sales-container td { display: block; width: 100%; box-sizing: border-box; }
@@ -143,30 +149,12 @@
                 margin-bottom: 12px; padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
                 display: flex; flex-wrap: wrap; align-items: center;
             }
-            
             #table-sales-container td { padding: 0; border: none; width: auto; display: block; }
-
-            /* ESQUERDA: Data e Itens */
-            #table-sales-container td:nth-child(1) { /* Data */
-                width: 100%; font-size: 0.75rem; color: #888; font-weight: 600; margin-bottom: 5px;
-            }
-            #table-sales-container td:nth-child(2) { display: none; } /* Esconde cliente no mobile (opcional, se quiser mostrar, mude aqui) */
-            
-            #table-sales-container td:nth-child(3) { /* Itens */
-                width: 70%; font-size: 0.9rem; color: #444; font-weight: 500;
-                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            }
-
-            /* DIREITA: Valor e Pagamento */
-            #table-sales-container td:nth-child(5) { /* Valor */
-                width: 30%; text-align: right; font-size: 1rem; font-weight: 800; color: var(--success);
-            }
-            
-            #table-sales-container td:nth-child(4) { /* Pagamento */
-                width: 100%; margin-top: 5px; font-size: 0.7rem; color: #666;
-                text-align: right; 
-            }
-            /* Formata o badge de pagamento para ficar alinhado com o valor */
+            #table-sales-container td:nth-child(1) { width: 100%; font-size: 0.75rem; color: #888; font-weight: 600; margin-bottom: 5px; }
+            #table-sales-container td:nth-child(2) { display: none; }
+            #table-sales-container td:nth-child(3) { width: 70%; font-size: 0.9rem; color: #444; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            #table-sales-container td:nth-child(5) { width: 30%; text-align: right; font-size: 1rem; font-weight: 800; color: var(--success); }
+            #table-sales-container td:nth-child(4) { width: 100%; margin-top: 5px; font-size: 0.7rem; color: #666; text-align: right; }
             #table-sales-container td:nth-child(4)::before { content: 'Pago via '; }
         }
     </style>
@@ -205,9 +193,14 @@
                 <button class="btn-filter" onclick="filterPDV('Fit-Macaquinho', this)">Macaquinho</button>
             </div>
             
-            <div style="display:flex; gap:15px; margin-bottom:20px;">
-                <input type="text" id="pdv-search" placeholder="🔍 Buscar..." onkeyup="renderPDV()" style="margin:0; border-radius:30px; border:none; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-                <button class="btn btn-pink" onclick="openBuilder()" style="border-radius:30px; white-space:nowrap; padding: 0 25px;">👙 Montar</button>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; align-items:center;">
+                <input type="text" id="pdv-search" placeholder="🔍 Buscar nome..." onkeyup="renderPDV()" style="margin:0; border-radius:30px; border:none; box-shadow:0 2px 10px rgba(0,0,0,0.05); flex: 1; min-width:150px;">
+                <select id="pdv-size" onchange="renderPDV()" style="margin:0; border-radius:30px; border:none; box-shadow:0 2px 10px rgba(0,0,0,0.05); flex: 1; min-width:100px;">
+                    <option value="todos">Tamanho (Todos)</option>
+                    <option value="PP">PP</option><option value="P">P</option><option value="M">M</option><option value="G">G</option><option value="GG">GG</option><option value="XG">XG</option><option value="U">U</option>
+                </select>
+                <input type="text" id="pdv-color" placeholder="🎨 Cor..." onkeyup="renderPDV()" style="margin:0; border-radius:30px; border:none; box-shadow:0 2px 10px rgba(0,0,0,0.05); flex: 1; min-width:100px;">
+                <button class="btn btn-pink" onclick="openBuilder()" style="border-radius:30px; white-space:nowrap; padding: 12px 25px;">👙 Montar</button>
             </div>
 
             <div id="pdv-loader" class="data-loader-container">
@@ -221,11 +214,14 @@
         <section id="clientes" class="view-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2>Clientes</h2>
-                <button class="btn btn-primary" onclick="openModal('modal-cliente')">+ Novo</button>
+                <button class="btn btn-primary" onclick="openModal('modal-cliente')">+ Novo Cliente</button>
             </div>
             <input type="text" id="search-cli" placeholder="Buscar cliente..." onkeyup="renderCustomers()">
             <div style="overflow-x:auto;">
-                <table style="margin-top:15px;"><thead style="background:#f8f9fa;"><tr><th>Nome</th><th>Telefone</th></tr></thead><tbody id="table-cli"></tbody></table>
+                <table style="margin-top:15px;">
+                    <thead style="background:#f8f9fa;"><tr><th>Nome</th><th>Telefone</th><th style="text-align:right;">Ações</th></tr></thead>
+                    <tbody id="table-cli"></tbody>
+                </table>
             </div>
         </section>
 
@@ -234,19 +230,36 @@
                 <h2>Estoque</h2>
                 <button class="btn btn-primary" onclick="nav('cadastro')">+ Adicionar</button>
             </div>
-            <input type="text" id="stock-search" placeholder="Filtrar estoque..." onkeyup="renderStock()">
+            
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" id="stock-search" placeholder="Filtrar por nome/cor..." onkeyup="renderStock()" style="margin:0; flex:2;">
+                <select id="stock-type-filter" onchange="renderStock()" style="margin:0; flex:1;">
+                    <option value="todos">Todas Categorias</option>
+                    <option value="Sutiã">Sutiãs</option>
+                    <option value="Calcinha">Calcinhas</option>
+                    <option value="Conjunto">Conjuntos</option>
+                    <option value="Fit-Top">Top Fit</option>
+                    <option value="Fit-Calça">Legging</option>
+                    <option value="Fit-Macacão">Macacão</option>
+                    <option value="Fit-Macaquinho">Macaquinho</option>
+                </select>
+            </div>
+
             <div style="overflow-x:auto;">
-                <table style="margin-top:15px;"><thead><tr><th>Item</th><th>Tam</th><th>R$</th><th>Qtd</th><th>Ação</th></tr></thead><tbody id="table-stock"></tbody></table>
+                <table style="margin-top:15px;">
+                    <thead><tr><th>Item</th><th>Cor</th><th>Tam</th><th>R$</th><th>Qtd</th><th>Ação</th></tr></thead>
+                    <tbody id="table-stock"></tbody>
+                </table>
             </div>
         </section>
 
         <section id="financeiro" class="view-section">
             <h2>Financeiro</h2>
             
-            <div style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); display:flex; align-items:center; gap:10px;">
-                <label style="font-weight:bold; color:var(--primary);">📅 Filtrar Data:</label>
-                <input type="date" id="fin-date-filter" style="margin:0; flex:1; max-width:200px; padding:8px; border:1px solid #ddd; border-radius:6px;" onchange="renderFinancials()">
-                <button class="btn btn-info" style="padding: 8px; width:auto;" onclick="document.getElementById('fin-date-filter').value=''; renderFinancials();">Todos</button>
+            <div style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <label style="font-weight:bold; color:var(--primary);">📅 Mês/Ano:</label>
+                <input type="month" id="fin-date-filter" style="margin:0; flex:1; max-width:200px; padding:8px; border:1px solid #ddd; border-radius:6px;" onchange="renderFinancials()">
+                <button class="btn btn-info" style="padding: 8px 15px; width:auto;" onclick="document.getElementById('fin-date-filter').value=''; renderFinancials();">Todos</button>
             </div>
 
             <div class="chart-container" style="background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); height: 350px; position: relative;">
@@ -293,7 +306,7 @@
         <section id="cadastro" class="view-section">
             <h2>Cadastrar Produto</h2>
             <div class="form-card">
-                <form onsubmit="saveProduct(event)">
+                <form id="form-cad">
                     <label>Nome do Modelo</label>
                     <input type="text" id="cad-name" required placeholder="Ex: Cortininha Onça">
                     
@@ -318,6 +331,9 @@
                         </div>
                     </div>
 
+                    <label>Cor (Opcional, Ex: Rosa, Preto)</label>
+                    <input type="text" id="cad-color" placeholder="Cor ou Estampa do produto">
+
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                         <div><label>Preço (R$)</label><input type="number" id="cad-price" step="0.01" required></div>
                         <div><label>Quantidade</label><input type="number" id="cad-qty" required></div>
@@ -329,7 +345,10 @@
                         <img id="cad-preview" style="width:100%; height:100%; object-fit:cover; display:none;">
                     </div>
 
-                    <button id="btn-save-new" class="btn btn-success" style="width:100%; margin-top:20px; height:50px; font-size:1.1rem;">SALVAR PRODUTO</button>
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button type="button" id="btn-save-stay" class="btn btn-primary" style="flex:1; padding: 15px;" onclick="submitProduct(false)">💾 Salvar e Cadastrar Outro</button>
+                        <button type="button" id="btn-save-go" class="btn btn-success" style="flex:1; padding: 15px;" onclick="submitProduct(true)">✅ Salvar e Ir p/ Estoque</button>
+                    </div>
                 </form>
             </div>
         </section>
@@ -351,7 +370,7 @@
 
 <div id="loading-overlay" class="loading-overlay">
     <div class="pulse-loader">💾</div>
-    <div style="margin-top: 20px; font-weight: bold; color: #333; background:white; padding: 5px 15px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">Salvando...</div>
+    <div style="margin-top: 20px; font-weight: bold; color: #333; background:white; padding: 5px 15px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">Processando...</div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeAll()"></div>
@@ -389,25 +408,28 @@
     <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="finishSale()">CONFIRMAR VENDA</button>
 </div>
 
-<div id="modal-builder" class="modal-box" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1300; display:none;">
+<div id="modal-builder" class="modal-box" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1300; display:none; width: 600px;">
     <h2 style="margin-top:0;">Montar Conjunto</h2>
+    <input type="text" id="build-search" placeholder="🔍 Filtrar peças (nome/cor/tamanho)..." onkeyup="renderBuilderLists()" style="width:100%; border-radius:30px; border:1px solid #ccc; padding:10px 15px; margin-bottom:15px;">
+    
     <div class="builder-grid">
-        <div><h4>Parte de Cima</h4><div id="list-tops" class="b-list"></div></div>
-        <div><h4>Parte de Baixo</h4><div id="list-bottoms" class="b-list"></div></div>
+        <div><h4 style="margin-top:0; color:var(--primary);">Parte de Cima</h4><div id="list-tops" class="b-list"></div></div>
+        <div><h4 style="margin-top:0; color:var(--pink);">Parte de Baixo</h4><div id="list-bottoms" class="b-list"></div></div>
     </div>
     <div style="background:#f0f0f0; padding:15px; border-radius:8px; margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
-        <div id="build-summary" style="font-size:0.9rem; color:#555;">Selecione...</div>
+        <div id="build-summary" style="font-size:0.9rem; color:#555;">Selecione as partes...</div>
         <div style="font-weight:bold; font-size:1.2rem; color:var(--primary);">R$ <span id="build-total">0.00</span></div>
     </div>
-    <button class="btn btn-pink" style="width:100%; margin-top:15px;" onclick="addComboToCart()">ADICIONAR AO CARRINHO</button>
+    <button class="btn btn-pink" style="width:100%; margin-top:15px; height: 50px; font-size:1.1rem;" onclick="addComboToCart()">ADICIONAR AO CARRINHO</button>
 </div>
 
 <div id="modal-cliente" class="modal-box" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1300; display:none;">
-    <h2 style="margin-top:0;">Novo Cliente</h2>
+    <h2 style="margin-top:0;" id="cli-modal-title">Novo Cliente</h2>
     <form onsubmit="saveCustomer(event)">
+        <input type="hidden" id="cli-id">
         <label>Nome Completo</label><input id="cli-name" required>
-        <label>WhatsApp</label><input id="cli-phone" required>
-        <button class="btn btn-primary" style="width:100%;">Salvar Cliente</button>
+        <label>WhatsApp (Somente números)</label><input id="cli-phone" type="number" placeholder="Ex: 21972243075" required>
+        <button class="btn btn-primary" style="width:100%;" id="btn-save-cli">Salvar Cliente</button>
     </form>
 </div>
 
@@ -423,6 +445,7 @@
             </label>
         </div>
         <label>Nome</label><input id="edit-name">
+        <label>Cor</label><input id="edit-color">
         <label>Tamanho</label>
         <select id="edit-size" style="margin-bottom:15px;">
             <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option><option>U</option>
@@ -431,7 +454,7 @@
             <div style="flex:1"><label>Preço</label><input id="edit-price" type="number" step="0.01"></div>
             <div style="flex:1"><label>Qtd</label><input id="edit-qty" type="number"></div>
         </div>
-        <button id="btn-save-edit" class="btn btn-primary" style="width:100%; height:50px; font-size:1.1rem; margin-top:10px;">💾 Atualizar</button>
+        <button id="btn-save-edit" class="btn btn-primary" style="width:100%; height:50px; font-size:1.1rem; margin-top:10px;">💾 Atualizar Produto</button>
         <button type="button" class="btn btn-danger" style="width:100%; margin-top:15px; background:#fff; color:var(--danger); border:1px solid var(--danger);" onclick="deleteItem(document.getElementById('edit-id').value)">🗑️ Excluir Produto</button>
     </form>
 </div>
@@ -461,7 +484,6 @@
     const NO_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' fill='%23aaa'%3ESem Foto%3C/text%3E%3C/svg%3E";
 
     window.onload = function() {
-        // NÃO definimos data padrão no filtro para mostrar tudo
         db.collection("inventory").onSnapshot(s=>{ 
             inventory=[]; 
             s.forEach(d=>inventory.push({...d.data(),id:d.id})); 
@@ -485,26 +507,22 @@
         });
     };
 
-    // --- CORREÇÃO DO FILTRO DE DATA ---
     function renderFinancials(){
-        const filterDate = document.getElementById('fin-date-filter').value;
+        const filterDate = document.getElementById('fin-date-filter').value; // Formato YYYY-MM
         let filtered = salesHistory;
         
         if (filterDate) {
             filtered = salesHistory.filter(s => {
-                // Se tiver dateIso (vendas novas), usa direto
-                if(s.dateIso) return s.dateIso === filterDate;
+                // Se a venda tem a data ISO nova (YYYY-MM-DD), verifica se começa com o Mês/Ano (YYYY-MM)
+                if(s.dateIso && s.dateIso.startsWith(filterDate)) return true;
                 
-                // Se for venda antiga (DD/MM/YYYY), converte na marra
+                // Conversão de vendas antigas (Formato DD/MM/YYYY) para comparar
                 if(s.date) {
                     try {
-                        const parts = s.date.split(' ')[0].split('/'); // Ex: 05/02/2026
-                        // Garante que dia e mes tenham 2 digitos (05 e não 5)
-                        const day = parts[0].padStart(2, '0');
+                        const parts = s.date.split(' ')[0].split('/'); // 05/02/2026
                         const month = parts[1].padStart(2, '0');
                         const year = parts[2];
-                        const formattedIso = `${year}-${month}-${day}`;
-                        return formattedIso === filterDate;
+                        return `${year}-${month}` === filterDate;
                     } catch(e) { return false; }
                 }
                 return false;
@@ -518,7 +536,7 @@
         const tb=document.getElementById('table-sales'); 
         
         if (filtered.length === 0) {
-            tb.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Nenhuma venda encontrada.</td></tr>';
+            tb.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Nenhuma venda encontrada para este período.</td></tr>';
         } else {
             tb.innerHTML = filtered.map(s => {
                 const shortMethod = shortenMethod(s.method);
@@ -542,7 +560,6 @@
         return m;
     }
 
-    // --- FUNÇÕES DE LAYOUT E AÇÃO ---
     function setLoading(isLoading, btnId) {
         const overlay = document.getElementById('loading-overlay');
         if(overlay) overlay.style.display = isLoading ? 'flex' : 'none';
@@ -551,10 +568,10 @@
             if(btn) {
                 if(isLoading) {
                     if(!btn.dataset.originalText) btn.dataset.originalText = btn.innerText;
-                    btn.innerText = "Processando...";
+                    btn.innerText = "⏳";
                     btn.disabled = true;
                 } else {
-                    btn.innerText = btn.dataset.originalText || "Salvar";
+                    btn.innerText = btn.dataset.originalText;
                     btn.disabled = false;
                 }
             }
@@ -586,6 +603,15 @@
         if(modalTimer) clearTimeout(modalTimer);
         const overlay = document.getElementById('modal-overlay');
         document.querySelectorAll('.modal-box').forEach(m => m.style.display = 'none');
+        
+        // Reset cliente form se for novo
+        if(id === 'modal-cliente') {
+            document.getElementById('cli-id').value = '';
+            document.getElementById('cli-name').value = '';
+            document.getElementById('cli-phone').value = '';
+            document.getElementById('cli-modal-title').innerText = 'Novo Cliente';
+        }
+
         overlay.style.display = 'flex';
         setTimeout(()=>overlay.classList.add('visible'), 10);
         const modal = document.getElementById(id);
@@ -610,21 +636,39 @@
     
     function renderPDV() {
         const g = document.getElementById('pdv-grid'); if(!g) return;
-        const t = document.getElementById('pdv-search').value.toLowerCase(); 
+        const nameQuery = document.getElementById('pdv-search').value.toLowerCase(); 
+        const sizeQuery = document.getElementById('pdv-size').value; 
+        const colorQuery = document.getElementById('pdv-color').value.toLowerCase(); 
+
         const html = inventory.filter(i=>{
             const n = i.name ? i.name.toLowerCase() : '';
-            return (pdvFilter==='todos'||i.type===pdvFilter) && n.includes(t);
+            const c = i.color ? i.color.toLowerCase() : '';
+            
+            const matchType = (pdvFilter==='todos'||i.type===pdvFilter);
+            const matchName = n.includes(nameQuery);
+            const matchSize = (sizeQuery === 'todos' || i.size === sizeQuery);
+            const matchColor = c.includes(colorQuery);
+
+            return matchType && matchName && matchSize && matchColor;
         }).map(i => {
-            // STOCK HIGHLIGHT
             const isZero = i.qty < 1;
             const op = isZero ? 0.6 : 1;
             const stockBadge = isZero ? '<div style="position:absolute; bottom:5px; left:5px; background:red; color:white; font-size:0.6rem; padding:2px 5px; border-radius:4px;">ESGOTADO</div>' : '';
+            const cText = i.color ? ` - ${i.color}` : '';
             
-            return `<div class="product-card" style="opacity:${op}" onclick="addToCart('${i.id}')">
+            // Highlight color if it's less than 3
+            let borderStyle = 'border: 1px solid transparent;';
+            if (i.qty > 0 && i.qty <= 3) {
+                borderStyle = 'border: 2px solid var(--warning);';
+            } else if (i.qty === 0) {
+                borderStyle = 'border: 2px solid var(--danger);';
+            }
+
+            return `<div class="product-card" style="opacity:${op}; ${borderStyle}" onclick="addToCart('${i.id}')">
                 <div class="size-badge">${i.size}</div>
                 ${stockBadge}
                 <img src="${i.img||NO_IMG}" loading="lazy">
-                <div class="info-box"><b>${i.name}</b><br><small>${i.type}</small><br><span style="color:var(--primary);font-weight:bold;">R$ ${i.price}</span></div>
+                <div class="info-box"><b>${i.name}</b><br><small style="color:#666">${i.type}${cText}</small><br><span style="color:var(--primary);font-weight:bold;">R$ ${i.price}</span></div>
             </div>`;
         }).join('');
         g.innerHTML = html;
@@ -736,14 +780,13 @@
         let filtered = salesHistory;
         if(filterDate) {
             filtered = salesHistory.filter(s => {
-                if(s.dateIso) return s.dateIso === filterDate;
+                if(s.dateIso && s.dateIso.startsWith(filterDate)) return true;
                 if(s.date) {
                     try {
                         const parts = s.date.split(' ')[0].split('/');
-                        const day = parts[0].padStart(2, '0');
                         const month = parts[1].padStart(2, '0');
                         const year = parts[2];
-                        return `${year}-${month}-${day}` === filterDate;
+                        return `${year}-${month}` === filterDate;
                     } catch(e) { return false; }
                 }
                 return false;
@@ -751,7 +794,7 @@
         }
         if(filtered.length === 0) return alert("Nada para imprimir.");
         let t = "Relatorio Financeiro Litoral Brasil\n";
-        t += filterDate ? `Data: ${filterDate.split('-').reverse().join('/')}\n` : "Periodo: Geral\n";
+        t += filterDate ? `Mes Base: ${filterDate.split('-').reverse().join('/')}\n` : "Periodo: Geral\n";
         t += "-----------------------------------\n";
         filtered.forEach(s => { const shortMethod = shortenMethod(s.method); t += `${s.date} | ${s.client} | ${shortMethod} | R$ ${s.total.toFixed(2)}\nItem: ${s.items}\n----------------\n`; });
         const tot = filtered.reduce((a,b)=>a+b.total,0); t += `\nTOTAL: R$ ${tot.toFixed(2)}`;
@@ -759,26 +802,194 @@
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Caixa_${filterDate || 'Geral'}.txt`; a.click();
     }
 
-    // Demais funções permanecem iguais
     function processImage(input, m) { if(input.files[0]) { const r = new FileReader(); r.onload=e=>{ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'); const x=c.getContext('2d'); c.width=200; c.height=(i.height*200)/i.width; x.drawImage(i,0,0,c.width,c.height); const d=c.toDataURL('image/jpeg',0.6); if(m==='new'){ tempImg=d; document.getElementById('cad-preview').src=d; document.getElementById('cad-preview').style.display='block'; } else { editImg=d; document.getElementById('edit-preview').src=d; } }; i.src=e.target.result; }; r.readAsDataURL(input.files[0]); } }
-    function saveProduct(e) { e.preventDefault(); setLoading(true, 'btn-save-new'); db.collection('inventory').add({ name: document.getElementById('cad-name').value, type: document.getElementById('cad-type').value, size: document.getElementById('cad-size').value, price: parseFloat(document.getElementById('cad-price').value), qty: parseInt(document.getElementById('cad-qty').value), img: tempImg, createdAt: new Date() }).then(()=>{ alert('Produto Salvo!'); e.target.reset(); tempImg=null; document.getElementById('cad-preview').style.display='none'; }).catch(err => alert('Erro')).finally(() => setLoading(false, 'btn-save-new')); }
+    
+    // CADASTRO DE PRODUTO CONTÍNUO
+    function submitProduct(goEstoque) {
+        const form = document.getElementById('form-cad');
+        if(!form.checkValidity()) { form.reportValidity(); return; }
+
+        setLoading(true, goEstoque ? 'btn-save-go' : 'btn-save-stay');
+        db.collection('inventory').add({
+            name: document.getElementById('cad-name').value,
+            type: document.getElementById('cad-type').value,
+            size: document.getElementById('cad-size').value,
+            color: document.getElementById('cad-color').value || '',
+            price: parseFloat(document.getElementById('cad-price').value),
+            qty: parseInt(document.getElementById('cad-qty').value),
+            img: tempImg,
+            createdAt: new Date()
+        }).then(()=>{
+            alert('Produto Salvo com Sucesso!');
+            form.reset();
+            tempImg=null;
+            document.getElementById('cad-preview').style.display='none';
+            if(goEstoque) nav('estoque');
+        }).catch(err => alert('Erro ao salvar produto'))
+        .finally(() => setLoading(false, goEstoque ? 'btn-save-go' : 'btn-save-stay'));
+    }
+
     function renderStock() { 
-        const t = document.getElementById('stock-search').value.toLowerCase(); const tb = document.getElementById('table-stock'); 
-        tb.innerHTML = inventory.filter(i=>(i.name||'').toLowerCase().includes(t)).map(i => {
+        const t = document.getElementById('stock-search').value.toLowerCase(); 
+        const typeF = document.getElementById('stock-type-filter').value;
+        const tb = document.getElementById('table-stock'); 
+        
+        tb.innerHTML = inventory.filter(i=>{
+            const strBusca = (i.name + ' ' + (i.color||'')).toLowerCase();
+            const matchQuery = strBusca.includes(t);
+            const matchType = (typeF === 'todos' || i.type === typeF);
+            return matchQuery && matchType;
+        }).map(i => {
             // STOCK ALERT
-            const style = i.qty < 1 ? 'background-color: #ffebee; color: #d32f2f; font-weight: bold;' : '';
-            const qtyText = i.qty < 1 ? '0 (Esgotado)' : i.qty;
-            return `<tr style="${style}"><td>${i.name}</td><td>${i.size}</td><td>${i.price}</td><td>${qtyText}</td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td></tr>`;
+            let rowClass = '';
+            let qtyText = i.qty;
+            if (i.qty === 0) {
+                rowClass = 'row-danger';
+                qtyText = '0 (Esgotado)';
+            } else if (i.qty <= 3) {
+                rowClass = 'row-warning';
+                qtyText = i.qty + ' (Acabando)';
+            }
+            
+            return `<tr class="${rowClass}">
+                <td>${i.name}<br><small style="color:#888;">${i.type}</small></td>
+                <td>${i.color || '-'}</td>
+                <td>${i.size}</td>
+                <td>${i.price}</td>
+                <td>${qtyText}</td>
+                <td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEdit('${i.id}')">Editar</button></td>
+            </tr>`;
         }).join(''); 
     }
-    function openEdit(id) { const i=inventory.find(x=>x.id===id); document.getElementById('edit-id').value=id; document.getElementById('edit-name').value=i.name; document.getElementById('edit-price').value=i.price; document.getElementById('edit-qty').value=i.qty; document.getElementById('edit-size').value = i.size || 'U'; editImg=i.img; document.getElementById('edit-preview').src = i.img || NO_IMG; openModal('modal-edit'); }
-    function saveEdit(e) { e.preventDefault(); setLoading(true, 'btn-save-edit'); const id=document.getElementById('edit-id').value; const u = { name:document.getElementById('edit-name').value, price:parseFloat(document.getElementById('edit-price').value), qty:parseInt(document.getElementById('edit-qty').value), size:document.getElementById('edit-size').value }; if(editImg) u.img=editImg; db.collection('inventory').doc(id).update(u).then(()=>{ closeAll(); alert('Atualizado!'); }).catch(err => alert('Erro')).finally(() => setLoading(false, 'btn-save-edit')); }
-    function deleteItem(id){ if(confirm('Excluir?')) { setLoading(true); db.collection('inventory').doc(id).delete().then(()=>{ closeAll(); }).finally(() => setLoading(false)); } }
-    function saveCustomer(e){ e.preventDefault(); db.collection('customers').add({name:document.getElementById('cli-name').value, phone:document.getElementById('cli-phone').value}).then(()=>{ closeAll(); alert('Cliente Salvo'); }); }
-    function renderCustomers(){ const tb=document.getElementById('table-cli'); tb.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(document.getElementById('search-cli').value.toLowerCase())).map(c => `<tr><td>${c.name}</td><td>${c.phone}</td></tr>`).join(''); }
-    function openBuilder(){ selTop=null; selBot=null; openModal('modal-builder'); const rt=document.getElementById('list-tops'); const rb=document.getElementById('list-bottoms'); rt.innerHTML = inventory.filter(i=>i.type==='Sutiã'&&i.qty>0).map(i => `<div class="b-item" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`).join(''); rb.innerHTML = inventory.filter(i=>i.type==='Calcinha'&&i.qty>0).map(i => `<div class="b-item" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;margin-right:10px;">${i.name}</div>`).join(''); }
-    function selPart(t,id,el){ const i=inventory.find(x=>x.id===id); if(t==='top')selTop=i; else selBot=i; Array.from(el.parentNode.children).forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); document.getElementById('build-total').innerText=((selTop?selTop.price:0)+(selBot?selBot.price:0)).toFixed(2); }
-    function addComboToCart(){ if(selTop)addToCart(selTop.id); if(selBot)addToCart(selBot.id); closeAll(); }
+
+    function openEdit(id) { 
+        const i=inventory.find(x=>x.id===id); 
+        document.getElementById('edit-id').value=id; 
+        document.getElementById('edit-name').value=i.name; 
+        document.getElementById('edit-color').value=i.color || ''; 
+        document.getElementById('edit-price').value=i.price; 
+        document.getElementById('edit-qty').value=i.qty; 
+        document.getElementById('edit-size').value = i.size || 'U'; 
+        editImg=i.img; 
+        document.getElementById('edit-preview').src = i.img || NO_IMG; 
+        openModal('modal-edit'); 
+    }
+    
+    function saveEdit(e) { 
+        e.preventDefault(); setLoading(true, 'btn-save-edit'); 
+        const id=document.getElementById('edit-id').value; 
+        const u = { 
+            name:document.getElementById('edit-name').value, 
+            color:document.getElementById('edit-color').value,
+            price:parseFloat(document.getElementById('edit-price').value), 
+            qty:parseInt(document.getElementById('edit-qty').value), 
+            size:document.getElementById('edit-size').value 
+        }; 
+        if(editImg) u.img=editImg; 
+        db.collection('inventory').doc(id).update(u).then(()=>{ closeAll(); alert('Atualizado!'); })
+        .catch(err => alert('Erro')).finally(() => setLoading(false, 'btn-save-edit')); 
+    }
+    
+    function deleteItem(id){ if(confirm('Tem certeza que deseja excluir o produto do estoque?')) { setLoading(true); db.collection('inventory').doc(id).delete().then(()=>{ closeAll(); }).finally(() => setLoading(false)); } }
+    
+    // GESTÃO DE CLIENTES
+    function saveCustomer(e){ 
+        e.preventDefault(); 
+        const id = document.getElementById('cli-id').value;
+        const btn = document.getElementById('btn-save-cli');
+        btn.innerText = 'Salvando...'; btn.disabled = true;
+
+        const data = {
+            name: document.getElementById('cli-name').value, 
+            phone: document.getElementById('cli-phone').value
+        };
+
+        if(id) {
+            db.collection('customers').doc(id).update(data).then(()=>{ 
+                closeAll(); alert('Cliente Atualizado'); 
+                btn.innerText = 'Salvar Cliente'; btn.disabled = false;
+            });
+        } else {
+            db.collection('customers').add(data).then(()=>{ 
+                closeAll(); alert('Novo Cliente Salvo'); 
+                btn.innerText = 'Salvar Cliente'; btn.disabled = false;
+            });
+        }
+    }
+
+    function openEditCustomer(id) {
+        const c = customers.find(x => x.id === id);
+        if(!c) return;
+        document.getElementById('cli-id').value = c.id;
+        document.getElementById('cli-name').value = c.name;
+        document.getElementById('cli-phone').value = c.phone;
+        document.getElementById('cli-modal-title').innerText = 'Editar Cliente';
+        openModal('modal-cliente');
+    }
+
+    function sendWpp(phone) {
+        let num = phone.replace(/\D/g, ''); // Remove traços e espaços
+        if(num.length === 10 || num.length === 11) num = '55' + num;
+        const msg = encodeURIComponent("Olá, muito obrigado pela sua compra!");
+        window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+    }
+
+    function renderCustomers(){ 
+        const tb=document.getElementById('table-cli'); 
+        const q = document.getElementById('search-cli').value.toLowerCase();
+        tb.innerHTML = customers.filter(c=>(c.name||'').toLowerCase().includes(q)).map(c => `
+            <tr>
+                <td>${c.name}</td>
+                <td>${c.phone}</td>
+                <td style="text-align:right; white-space:nowrap;">
+                    <button class="btn btn-info" style="padding:6px 10px; font-size:0.8rem; margin-right:5px;" onclick="openEditCustomer('${c.id}')">✏️ Editar</button>
+                    <button class="btn btn-success" style="padding:6px 10px; font-size:0.8rem;" onclick="sendWpp('${c.phone}')">📱 Wpp</button>
+                </td>
+            </tr>`).join(''); 
+    }
+    
+    // MONTAR CONJUNTO COM BUSCA
+    function renderBuilderLists() {
+        const t = document.getElementById('build-search').value.toLowerCase();
+        const rt=document.getElementById('list-tops'); 
+        const rb=document.getElementById('list-bottoms'); 
+        
+        rt.innerHTML = inventory.filter(i=>i.type==='Sutiã' && i.qty>0 && (i.name+' '+i.color+' '+i.size).toLowerCase().includes(t))
+            .map(i => `<div class="b-item ${selTop&&selTop.id===i.id?'selected':''}" onclick="selPart('top','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;height:40px;object-fit:cover;margin-right:10px;border-radius:4px;">${i.name} ${i.color?'- '+i.color:''} (${i.size})</div>`).join('');
+            
+        rb.innerHTML = inventory.filter(i=>i.type==='Calcinha' && i.qty>0 && (i.name+' '+i.color+' '+i.size).toLowerCase().includes(t))
+            .map(i => `<div class="b-item ${selBot&&selBot.id===i.id?'selected':''}" onclick="selPart('bot','${i.id}',this)"><img src="${i.img||NO_IMG}" style="width:40px;height:40px;object-fit:cover;margin-right:10px;border-radius:4px;">${i.name} ${i.color?'- '+i.color:''} (${i.size})</div>`).join(''); 
+    }
+
+    function openBuilder(){ 
+        selTop=null; selBot=null; 
+        document.getElementById('build-search').value = '';
+        document.getElementById('build-total').innerText = '0.00';
+        document.getElementById('build-summary').innerText = 'Selecione as partes...';
+        openModal('modal-builder'); 
+        renderBuilderLists();
+    }
+    
+    function selPart(t,id,el){ 
+        const i=inventory.find(x=>x.id===id); 
+        if(t==='top')selTop=i; else selBot=i; 
+        
+        Array.from(el.parentNode.children).forEach(c=>c.classList.remove('selected')); 
+        el.classList.add('selected'); 
+        
+        document.getElementById('build-total').innerText=((selTop?selTop.price:0)+(selBot?selBot.price:0)).toFixed(2); 
+        
+        let sumStr = '';
+        if(selTop) sumStr += `Top: ${selTop.name} (${selTop.size})`;
+        if(selBot) sumStr += (sumStr ? ' | ' : '') + `Bottom: ${selBot.name} (${selBot.size})`;
+        document.getElementById('build-summary').innerText = sumStr || 'Selecione as partes...';
+    }
+    
+    function addComboToCart(){ 
+        if(selTop)addToCart(selTop.id); 
+        if(selBot)addToCart(selBot.id); 
+        closeAll(); 
+    }
 </script>
 </body>
 </html>
